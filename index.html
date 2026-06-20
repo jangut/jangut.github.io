@@ -272,6 +272,13 @@
     flex: 1;
     overflow-y: auto;
     background: var(--bg-void);
+    display: flex;
+    justify-content: center;
+  }
+  
+  .editor-body-inner{
+    width: 100%;
+    max-width: 960px;
   }
 
   .panel{ display: none; }
@@ -592,6 +599,7 @@
       </div>
 
       <div class="editor-body">
+        <div class="editor-body-inner">
 
         <!-- index 面板 -->
         <section class="panel active" id="panel-index">
@@ -703,6 +711,7 @@
           </div>
         </section>
 
+        </div>
       </div>
 
       <div class="statusbar">
