@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>合成生日蛋糕</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@500;700;800&display=swap');
+
+  :root{
+    --bg-a: #fff4ed;
+    --bg-b: #ede6fb;
+    --panel: #ffffff;
+    --ink: #4a3f55;
+    --ink-soft: #8d80a3;
+    --pink: #ff8fb1;
+    --shadow: rgba(150, 120, 170, 0.25);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none; }
+  body{
+    min-height: 100vh;
+    display:flex; justify-content:center; align-items:flex-start;
+    padding: 30px 16px 60px;
+    font-family: 'Nunito', sans-serif;
+    color: var(--ink);
+    background: linear-gradient(160deg, var(--bg-a) 0%, var(--bg-b) 100%);
+    overflow-x: hidden;
+    position: relative;
+  }
+  .blob{
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: .5;
+    z-index: 0;
+    animation: float 9s ease-in-out infinite;
+  }
+  .blob.b1{ width:140px; height:140px; background: #ffd9e8; top:-40px; left:-40px; animation-delay: 0s; }
+  .blob.b2{ width:100px; height:100px; background: #c9f7e3; bottom:40px; right:-30px; animation-delay: 1.5s; }
+  .blob.b3{ width:70px; height:70px; background: #cfe3ff; bottom:-20px; left:30px; animation-delay: 3s; }
+  @keyframes float{
+    0%,100%{ transform: translateY(0) translateX(0); }
+    50%{ transform: translateY(-16px) translateX(8px); }
+  }
+
+  .wrap{ width:100%; max-width: 400px; position: relative; z-index: 1; }
+
+  .topline{
+    display:flex; justify-content: space-between; align-items:flex-end;
+    margin-bottom: 6px;
+  }
+  h1{
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.15;
+    text-shadow: 2px 3px 0 rgba(255,255,255,0.7);
+  }
+  .sub{ font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 18px; font-weight: 700; line-height:1.6; }
+
+  .scores{ display:flex; gap: 10px; flex-shrink:0; }
+  .pill{
+    background: var(--panel);
+    border-radius: 18px;
+    padding: 7px 14px;
+    text-align:center;
+    box-shadow: 0 6px 0 var(--shadow);
+    min-width: 56px;
+  }
+  .pill .k{ font-size: 10px; color: var(--ink-soft); font-weight:800; letter-spacing: .5px; }
+  .pill .v{ font-family:'Baloo 2',sans-serif; font-size: 18px; font-weight: 700; color: var(--pink); }
+
+  .info{
+    background: rgba(255,255,255,0.6);
+    border-radius: 16px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  .info b{ color: var(--ink); }
+
+  .restart-btn{
+    width: 100%;
+    background: var(--pink);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 13px 0;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-bottom: 18px;
+    box-shadow: 0 6px 0 #d9628a;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .restart-btn:active{ transform: translateY(4px); box-shadow: 0 2px 0 #d9628a; }
+
+  .grid-container{
+    background: var(--panel);
+    border-radius: 22px;
+    padding: 10px;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    touch-action: none;
+    box-shadow: 0 10px 0 var(--shadow), 0 14px 24px rgba(150,120,170,0.18);
+  }
+  .grid-background{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    grid-template-rows: repeat(4,1fr);
+    gap: 10px; width:100%; height:100%;
+  }
+  .grid-cell{
+    background: #f6f1fb;
+    border-radius: 14px;
+  }
+  .tiles-container{
+    position:absolute; top:10px; left:10px; right:10px; bottom:10px;
+    pointer-events:none;
+  }
+  .tile{
+    position:absolute;
+    width: calc((100% - 30px) / 4);
+    height: calc((100% - 30px) / 4);
+    display:flex; justify-content:center; align-items:center;
+    border-radius: 14px;
+    transition: top .12s cubic-bezier(.34,1.56,.64,1), left .12s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: inset 0 -4px 0 rgba(0,0,0,0.08), inset 0 3px 0 rgba(255,255,255,0.5);
+  }
+  .tile .dessert{
+    font-size: 30px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 1px rgba(0,0,0,0.12));
+  }
+  .tile .price{
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    background: #fff;
+    color: var(--ink);
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 9.5px;
+    padding: 1.5px 5px;
+    border-radius: 8px;
+    border: 1.5px solid #f0e6f7;
+    box-shadow: 0 2px 0 rgba(150,120,170,0.2);
+    transform: rotate(-6deg);
+  }
+
+  /* tray colors behind each dessert tier */
+  .tile-2{ background:#cdeede; }
+  .tile-4{ background:#bfe3ff; }
+  .tile-8{ background:#ffe1b3; }
+  .tile-16{ background:#ffd9c2; }
+  .tile-32{ background:#ffc9a3; }
+  .tile-64{ background:#ffb3b3; }
+  .tile-128{ background:#ff8fb1; }
+  .tile-256{ background:#e3a3ff; }
+  .tile-512{ background:#bf8fff; }
+  .tile-1024{ background:#8f7aff; }
+  .tile-2048{ background: linear-gradient(135deg,#ffd34d,#ff8fb1); box-shadow: 0 0 0 3px #fff, 0 0 16px rgba(255,143,177,0.6), inset 0 -4px 0 rgba(0,0,0,0.08), inset 0 3px 0 rgba(255,255,255,0.5); }
+  .tile-2048 .dessert{ font-size: 32px; }
+
+  @keyframes squish{
+    0%{ transform: scale(0.5); }
+    55%{ transform: scale(1.15) rotate(2deg); }
+    75%{ transform: scale(0.95) rotate(-1deg); }
+    100%{ transform: scale(1) rotate(0); }
+  }
+  .new-tile{ animation: squish .28s cubic-bezier(.34,1.56,.64,1); }
+
+  .overlay{
+    position:absolute; inset:0;
+    background: rgba(255,244,237,0.94);
+    display:none; flex-direction:column; justify-content:center; align-items:center;
+    border-radius: 22px; z-index: 100;
+    text-align: center;
+    padding: 0 20px;
+  }
+  .overlay.active{ display:flex; }
+  .overlay .big-emoji{ font-size: 50px; margin-bottom: 6px; }
+  .overlay h2{
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 24px;
+    margin-bottom: 18px;
+    color: var(--ink);
+  }
+  .overlay button{
+    background: var(--pink);
+    color: #fff;
+    border: none;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    padding: 11px 26px;
+    border-radius: 18px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #d9628a;
+  }
+
+  .footer-note{
+    text-align:center; font-size: 11px; color: var(--ink-soft); margin-top: 16px; font-weight:700;
+  }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <div class="wrap">
+    <div class="topline">
+      <h1>合成<br>生日蛋糕</h1>
+      <div class="scores">
+        <div class="pill"><div class="k">分数</div><div class="v" id="score">0</div></div>
+        <div class="pill"><div class="k">最高</div><div class="v" id="best-score">0</div></div>
+      </div>
+    </div>
+    <div class="sub">从一颗糖果开始，一路合成出甜品店的招牌生日蛋糕 🎂 每个方块右下角是它的"售价"～</div>
+
+    <div class="info">用<b>方向键</b>或<b>滑动屏幕</b>移动甜品，两个相同的甜品碰一起就会升级成更贵更好吃的下一款！</div>
+
+    <button class="restart-btn" onclick="restartGame()">开张营业 ✨</button>
+
+    <div class="grid-container" id="grid-container">
+      <div class="grid-background" id="grid-background"></div>
+      <div class="tiles-container" id="tiles-container"></div>
+      <div class="overlay" id="game-over-overlay">
+        <div class="big-emoji" id="overlay-emoji">🎂</div>
+        <h2 id="overlay-title">生日蛋糕做好啦！</h2>
+        <button onclick="restartGame()">再开一家店</button>
+      </div>
+    </div>
+
+    <div class="footer-note">慢慢拼，蛋糕总会做好的 🌙</div>
+  </div>
+
+<script>
+  let board = [];
+  let score = 0;
+  let bestScore = 0;
+  let gameOver = false;
+  let won = false;
+  const size = 4;
+  const GAP = 10; // must match .grid-background gap and tiles-container inset
+
+  // dessert progression: value -> { emoji, name }
+  const DESSERTS = {
+    2:    { e: '🍬', n: '水果糖' },
+    4:    { e: '🍭', n: '棒棒糖' },
+    8:    { e: '🍪', n: '曲奇饼干' },
+    16:   { e: '🧇', n: '华夫饼' },
+    32:   { e: '🍩', n: '甜甜圈' },
+    64:   { e: '🧁', n: '纸杯蛋糕' },
+    128:  { e: '🍮', n: '布丁' },
+    256:  { e: '🥧', n: '水果派' },
+    512:  { e: '🍫', n: '巧克力蛋糕' },
+    1024: { e: '🍰', n: '芝士蛋糕' },
+    2048: { e: '🎂', n: '生日蛋糕' },
+  };
+  function dessertFor(val){
+    return DESSERTS[val] || DESSERTS[2048];
+  }
+
+  const tilesContainer = document.getElementById('tiles-container');
+  const gridBackground = document.getElementById('grid-background');
+  const scoreElement = document.getElementById('score');
+  const bestScoreElement = document.getElementById('best-score');
+  const overlay = document.getElementById('game-over-overlay');
+  const overlayTitle = document.getElementById('overlay-title');
+  const overlayEmoji = document.getElementById('overlay-emoji');
+
+  function initGridBackground(){
+    gridBackground.innerHTML = '';
+    for(let i=0;i<size*size;i++){
+      const cell = document.createElement('div');
+      cell.classList.add('grid-cell');
+      gridBackground.appendChild(cell);
+    }
+  }
+
+  function initBoard(){
+    board = Array.from({length:size}, () => Array(size).fill(0));
+    score = 0; gameOver = false; won = false;
+    overlay.classList.remove('active');
+    addRandomTile();
+    addRandomTile();
+    render();
+    updateScore();
+  }
+
+  function addRandomTile(){
+    let empty = [];
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(board[r][c]===0) empty.push({r,c});
+    if(empty.length>0){
+      const {r,c} = empty[Math.floor(Math.random()*empty.length)];
+      board[r][c] = Math.random() < 0.9 ? 2 : 4;
+    }
+  }
+
+  // position stride uses the same (100% - 3*gap)/4 base as the tile width,
+  // so tiles line up exactly with the background cells at every column/row.
+  function tilePos(i){
+    return `calc(${i} * (100% - ${3*GAP}px) / 4 + ${i*GAP}px)`;
+  }
+
+  function render(){
+    tilesContainer.innerHTML = '';
+    for(let r=0;r<size;r++){
+      for(let c=0;c<size;c++){
+        const val = board[r][c];
+        if(val !== 0){
+          const tile = document.createElement('div');
+          const cls = val <= 2048 ? val : 2048;
+          const d = dessertFor(val);
+          tile.className = `tile tile-${cls} new-tile`;
+          tile.innerHTML = `<div class="dessert">${d.e}</div><div class="price">¥${val}</div>`;
+          tile.title = d.n;
+          tile.style.top = tilePos(r);
+          tile.style.left = tilePos(c);
+          tilesContainer.appendChild(tile);
+        }
+      }
+    }
+  }
+
+  function updateScore(){
+    scoreElement.innerText = score;
+    if(score > bestScore) bestScore = score;
+    bestScoreElement.innerText = bestScore;
+  }
+
+  function slide(row){
+    let arr = row.filter(v => v !== 0);
+    for(let i=0;i<arr.length-1;i++){
+      if(arr[i] === arr[i+1]){
+        arr[i] *= 2;
+        score += arr[i];
+        if(arr[i] === 2048 && !won) won = true;
+        arr.splice(i+1,1);
+      }
+    }
+    while(arr.length < size) arr.push(0);
+    return arr;
+  }
+
+  function copyBoard(b){ return b.map(row => [...row]); }
+
+  function isChanged(a,b){
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(a[r][c] !== b[r][c]) return true;
+    return false;
+  }
+
+  function rotateLeft(m){
+    let res = Array.from({length:size}, () => Array(size).fill(0));
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) res[size-1-c][r] = m[r][c];
+    return res;
+  }
+  function rotateRight(m){
+    let res = Array.from({length:size}, () => Array(size).fill(0));
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) res[c][size-1-r] = m[r][c];
+    return res;
+  }
+
+  function move(direction){
+    if(gameOver) return;
+    let oldBoard = copyBoard(board);
+    let newBoard = copyBoard(board);
+    if(direction === 'left'){ newBoard = newBoard.map(slide); }
+    else if(direction === 'right'){ newBoard = newBoard.map(row => slide(row.reverse()).reverse()); }
+    else if(direction === 'up'){ newBoard = rotateLeft(newBoard); newBoard = newBoard.map(slide); newBoard = rotateRight(newBoard); }
+    else if(direction === 'down'){ newBoard = rotateLeft(newBoard); newBoard = newBoard.map(row => slide(row.reverse()).reverse()); newBoard = rotateRight(newBoard); }
+
+    if(isChanged(oldBoard, newBoard)){
+      board = newBoard;
+      addRandomTile();
+      render();
+      updateScore();
+      checkGameOver();
+      if(won){
+        overlayEmoji.innerText = '🎂';
+        overlayTitle.innerText = "生日蛋糕做好啦！🎉";
+        overlay.classList.add('active');
+        won = false;
+        setTimeout(() => { if(!gameOver) overlay.classList.remove('active'); }, 1800);
+      }
+    }
+  }
+
+  function checkGameOver(){
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(board[r][c] === 0) return;
+    for(let r=0;r<size;r++){
+      for(let c=0;c<size;c++){
+        if(c < size-1 && board[r][c] === board[r][c+1]) return;
+        if(r < size-1 && board[r][c] === board[r+1][c]) return;
+      }
+    }
+    gameOver = true;
+    overlayEmoji.innerText = '🥺';
+    overlayTitle.innerText = "甜品店打烊啦~";
+    overlay.classList.add('active');
+  }
+
+  function restartGame(){ initBoard(); }
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); move('left'); }
+    else if(e.key === 'ArrowRight'){ e.preventDefault(); move('right'); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); move('up'); }
+    else if(e.key === 'ArrowDown'){ e.preventDefault(); move('down'); }
+  });
+
+  let startX, startY;
+  const gridContainer = document.getElementById('grid-container');
+  gridContainer.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+  }, {passive:true});
+  gridContainer.addEventListener('touchend', (e) => {
+    if(!startX || !startY) return;
+    let dx = e.changedTouches[0].clientX - startX;
+    let dy = e.changedTouches[0].clientY - startY;
+    if(Math.abs(dx) > Math.abs(dy)){
+      if(Math.abs(dx) > 20) move(dx > 0 ? 'right' : 'left');
+    } else {
+      if(Math.abs(dy) > 20) move(dy > 0 ? 'down' : 'up');
+    }
+    startX = null; startY = null;
+  }, {passive:true});
+
+  initGridBackground();
+  initBoard();
+</script>
+</body>
+</html>
