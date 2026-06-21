@@ -1,0 +1,23 @@
+﻿{
+  "name": "合成生日蛋糕",
+  "short_name": "生日蛋糕",
+  "description": "2048 变种甜品合成小游戏",
+  "start_url": "2048-cake.html",
+  "display": "standalone",
+  "background_color": "#fff4ed",
+  "theme_color": "#ff8fb1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
