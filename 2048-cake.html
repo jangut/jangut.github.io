@@ -73,14 +73,17 @@
     font-size: 30px;
     font-weight: 800;
     line-height: 1.15;
+    color: var(--ink);
+    filter: drop-shadow(1px 2px 2px rgba(200,100,150,0.3));
+  }
+  .title-text{
     background: linear-gradient(135deg, #ff8fb1 0%, #c44a7a 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(1px 2px 2px rgba(200,100,150,0.3));
   }
   @media (prefers-color-scheme: dark) {
-    h1{
+    .title-text{
       background: linear-gradient(135deg, #ffb3c6 0%, #e67a9f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -345,7 +348,7 @@
 
   <div class="wrap">
     <div class="topline">
-      <h1 class="cute-title">🧁 合成<br>生日蛋糕 🎂</h1>
+      <h1 class="cute-title">🧁 <span class="title-text">合成<br>生日蛋糕</span> 🎂</h1>
       <div class="top-right-group">
         <div class="scores">
           <div class="pill"><div class="k">分数</div><div class="v" id="score">0</div></div>
@@ -357,7 +360,7 @@
     </div>
 
     <div class="settings-menu" id="settings-menu">
-      <div class="settings-item" id="settings-restart"><span>✨</span> 开张营业</div>
+      <div class="settings-item" id="settings-restart"><span>✨</span> 重新尝试</div>
       <div class="settings-item"><span>🔊</span><input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5"></div>
       <div class="settings-item" id="settings-sfx"><span id="sfx-icon">🔔</span> 音效</div>
     </div>
@@ -366,20 +369,20 @@
 
     <div class="info">用<b>方向键</b>或<b>滑动屏幕</b>移动甜品，两个相同的甜品碰一起就会升级成更贵更好吃的下一款！</div>
 
-    <button class="restart-btn" id="restart-btn" onclick="restartGame()">开张营业 ✨</button>
+    <button class="restart-btn" id="restart-btn" onclick="restartGame()">重新尝试 ✨</button>
 
     <div class="grid-container" id="grid-container">
       <div class="grid-background" id="grid-background"></div>
       <div class="tiles-container" id="tiles-container"></div>
       <div class="start-overlay" id="start-overlay">
-        <div class="start-icon">🍰</div>
+        <div class="start-icon">🎂</div>
         <h2>合成生日蛋糕</h2>
         <p>滑动或方向键移动方块</p>
         <button onclick="startGame()">🎮 开始游戏</button>
       </div>
       <div class="overlay" id="game-over-overlay">
         <video id="overlay-video" muted playsinline webkit-playsinline preload="auto" src="source/video/fail.mp4"></video>
-        <button class="restart-overlay-btn" id="overlay-restart-btn" onclick="restartGame()">再开一家店 ✨</button>
+        <button class="restart-overlay-btn" id="overlay-restart-btn" onclick="restartGame()">再试一次 ✨</button>
       </div>
     </div>
 
@@ -430,6 +433,8 @@
 
   const bumpSfx = new Audio('source/music/bump.mp3');
   const buttonSfx = new Audio('source/music/buttom.mp3');
+  const failSfx = new Audio('source/music/fail.mp3');
+  const victorySfx = new Audio('source/music/victory.mp3');
 
   function playBump(){
     if(!sfxEnabled || masterMuted) return;
@@ -504,7 +509,12 @@
     }
   }
 
+  function stopGameOverSounds(){
+    failSfx.pause(); failSfx.currentTime = 0;
+    victorySfx.pause(); victorySfx.currentTime = 0;
+  }
   function initBoard(){
+    stopGameOverSounds();
     board = Array.from({length:size}, () => Array(size).fill(0));
     score = 0; gameOver = false; won = false;
     overlay.classList.remove('active');
@@ -620,17 +630,18 @@
       checkGameOver();
       if(won){
         won = false;
+        bgm.pause();
+        victorySfx.currentTime = 0;
+        victorySfx.play().catch(()=>{});
         overlayVideo.src = 'source/video/victory.mp4';
-        overlayVideo.onended = null;
+        overlayVideo.onended = () => {
+          overlayVideo.currentTime = overlayVideo.duration - 0.1;
+          document.getElementById('overlay-restart-btn').classList.add('show');
+        };
         overlay.classList.add('active');
         overlayVideo.load();
-        overlayVideo.play().catch(()=>{ overlay.classList.remove('active'); });
+        overlayVideo.play().catch(()=>{ overlay.classList.remove('active'); document.getElementById('overlay-restart-btn').classList.add('show'); });
         localStorage.setItem('2048-best', bestScore);
-        setTimeout(() => {
-          overlay.classList.remove('active');
-          overlayVideo.pause();
-          overlayVideo.currentTime = 0;
-        }, 1800);
       }
     }
   }
@@ -644,14 +655,17 @@
       }
     }
     gameOver = true;
+    bgm.pause();
+    failSfx.currentTime = 0;
+    failSfx.play().catch(()=>{});
     overlayVideo.loop = false;
     overlayVideo.onended = () => {
       overlayVideo.currentTime = overlayVideo.duration - 0.1;
+      document.getElementById('overlay-restart-btn').classList.add('show');
     };
     overlay.classList.add('active');
     const failPlay = overlayVideo.play();
     if(failPlay) failPlay.catch(()=>{ overlay.classList.remove('active'); document.getElementById('overlay-restart-btn').classList.add('show'); });
-    document.getElementById('overlay-restart-btn').classList.add('show');
   }
 
   function restartGame(){
