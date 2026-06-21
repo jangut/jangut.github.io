@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -32,7 +32,7 @@
     .blob.b3 { background: #1a2535; }
     .info { background: rgba(45, 38, 64, 0.7); }
     .grid-cell { background: #221c30; }
-    .tile .price { background: #1a1625; border-color: #2d2640; color: #e8e0f0; }
+    .tile .price { background: #3d2a40; color: #ff8fb1; border-color: #5a4068; }
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none; }
@@ -129,6 +129,13 @@
   .settings-item input[type="range"]{
     width: 80px; height: 4px; accent-color: var(--pink);
   }
+  .mute-btn{
+    font-size: 20px; cursor: pointer; line-height: 1;
+    transition: transform .2s;
+    filter: drop-shadow(0 2px 0 var(--shadow));
+  }
+  .mute-btn:hover{ transform: scale(1.15); }
+
 
   .info{
     background: rgba(255,255,255,0.6);
@@ -204,10 +211,10 @@
     position: absolute;
     right: -4px;
     bottom: -4px;
-    background: #fff;
-    color: var(--ink);
+    background: #ffecf3;
+    color: #c44a7a;
     font-family: 'Baloo 2', sans-serif;
-    font-weight: 700;
+    font-weight: 800;
     font-size: 10.5px;
     padding: 2px 6px;
     border-radius: 9px;
@@ -230,9 +237,9 @@
   .tile-2048 .dessert{ font-size: 34px; }
 
   @keyframes squish{
-    0%{ transform: scale(0.5); }
-    55%{ transform: scale(1.15) rotate(2deg); }
-    75%{ transform: scale(0.95) rotate(-1deg); }
+    0%{ transform: scale(0.55); }
+    55%{ transform: scale(1.06) rotate(1deg); }
+    75%{ transform: scale(0.97) rotate(-0.5deg); }
     100%{ transform: scale(1) rotate(0); }
   }
   .new-tile{ animation: squish .28s cubic-bezier(.34,1.56,.64,1); }
@@ -252,6 +259,30 @@
     display: block;
     pointer-events: none;
   }
+  .overlay .restart-overlay-btn{
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--pink);
+    color: #fff;
+    border: none;
+    font-family: ''Baloo 2'', sans-serif;
+    font-weight: 700;
+    padding: 11px 26px;
+    border-radius: 18px;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #d9628a;
+    z-index: 101;
+    display: none;
+    transition: transform .08s, box-shadow .08s;
+  }
+  .overlay .restart-overlay-btn:active{
+    transform: translateX(-50%) translateY(3px);
+    box-shadow: 0 2px 0 #d9628a;
+  }
+  .overlay .restart-overlay-btn.show{ display: block; }
 
   .footer-note{
     text-align:center; font-size: 11px; color: var(--ink-soft); margin-top: 16px; font-weight:700;
@@ -271,6 +302,7 @@
           <div class="pill"><div class="k">分数</div><div class="v" id="score">0</div></div>
           <div class="pill"><div class="k">最高</div><div class="v" id="best-score">0</div></div>
         </div>
+        <div class="mute-btn" id="mute-btn">🔊</div>
         <div class="settings-icon" id="settings-btn">⚙️</div>
       </div>
     </div>
@@ -291,7 +323,8 @@
       <div class="grid-background" id="grid-background"></div>
       <div class="tiles-container" id="tiles-container"></div>
       <div class="overlay" id="game-over-overlay">
-        <video id="overlay-video" muted playsinline preload="auto"></video>
+        <video id="overlay-video" playsinline preload="auto"></video>
+        <button class="restart-overlay-btn" id="overlay-restart-btn" onclick="restartGame()">再开一家店 ✨</button>
       </div>
     </div>
 
@@ -344,12 +377,12 @@
   const buttonSfx = new Audio('source/music/buttom.mp3');
 
   function playBump(){
-    if(!sfxEnabled) return;
+    if(!sfxEnabled || masterMuted) return;
     bumpSfx.currentTime = 0;
     bumpSfx.play().catch(()=>{});
   }
   function playButton(){
-    if(!sfxEnabled) return;
+    if(!sfxEnabled || masterMuted) return;
     buttonSfx.currentTime = 0;
     buttonSfx.play().catch(()=>{});
   }
@@ -386,6 +419,15 @@
   volumeSlider.addEventListener('input', (e) => {
     setVolume(parseFloat(e.target.value));
   });
+  let masterMuted = false;
+  const muteBtn = document.getElementById('mute-btn');
+  muteBtn.addEventListener('click', () => {
+    masterMuted = !masterMuted;
+    muteBtn.textContent = masterMuted ? '🔇' : '🔊';
+    if(masterMuted){ bgm.pause(); }
+    else { bgm.play().catch(()=>{}); }
+  });
+
   document.getElementById('settings-sfx').addEventListener('click', (e) => {
     sfxEnabled = !sfxEnabled;
     document.getElementById('sfx-icon').textContent = sfxEnabled ? '\uD83D\uDD14' : '\uD83D\uDD15';
@@ -408,6 +450,7 @@
     overlayVideo.pause();
     overlayVideo.currentTime = 0;
     restartBtn.classList.remove('show');
+    document.getElementById('overlay-restart-btn').classList.remove('show');
     addRandomTile();
     addRandomTile();
     render();
@@ -546,7 +589,7 @@
     };
     overlay.classList.add('active');
     overlayVideo.play().catch(()=>{});
-    restartBtn.classList.add('show');
+    document.getElementById('overlay-restart-btn').classList.add('show');
   }
 
   function restartGame(){
