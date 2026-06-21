@@ -328,6 +328,19 @@
   .start-overlay button:active{
     transform: translateY(3px); box-shadow:0 2px 0 #d9628a;
   }
+  .start-overlay button:disabled{
+    opacity:0.4; cursor:not-allowed; transform:none !important; box-shadow:0 5px 0 #d9628a !important;
+  }
+  .start-loading{
+    display:flex; align-items:center; gap:10px;
+    color:var(--ink-soft); font-size:13px; font-weight:700; margin-bottom:16px;
+  }
+  .start-loading .spinner{
+    width:18px; height:18px;
+    border:3px solid var(--pink); border-top-color:transparent;
+    border-radius:50%; animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
   @media (max-width:380px){
     .cute-title{ font-size:24px; }
     .pill .v{ font-size:15px; }
@@ -378,7 +391,11 @@
         <div class="start-icon">🎂</div>
         <h2>合成生日蛋糕</h2>
         <p>滑动或方向键移动方块</p>
-        <button onclick="startGame()">🎮 开始游戏</button>
+        <div class="start-loading" id="start-loading">
+          <div class="spinner"></div>
+          <span id="load-text">加载资源中…</span>
+        </div>
+        <button id="start-btn" onclick="startGame()" disabled>🎮 开始游戏</button>
       </div>
       <div class="overlay" id="game-over-overlay">
         <video id="overlay-video" muted playsinline webkit-playsinline preload="auto" src="source/video/fail.mp4"></video>
@@ -441,7 +458,7 @@
   function _url(path) { return _blob[path] || path; }
 
   // 开始下载全部7个文件
-  [
+  const RESOURCES = [
     'source/music/BGM.mp3',
     'source/music/bump.mp3',
     'source/music/buttom.mp3',
@@ -449,7 +466,14 @@
     'source/music/victory.mp3',
     'source/video/fail.mp4',
     'source/video/victory.mp4',
-  ].forEach(_preload);
+  ];
+  RESOURCES.forEach(_preload);
+
+  // 全部下载完后启用开始按钮
+  Promise.all(RESOURCES.map(_preload)).then(() => {
+    document.getElementById('start-loading').style.display = 'none';
+    document.getElementById('start-btn').disabled = false;
+  });
 
   // 创建Audio：先用原URL占位，blob就绪后切成blob URL
   function makeAudio(path) {
