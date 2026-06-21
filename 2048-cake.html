@@ -93,7 +93,10 @@
   .sub{ font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 18px; font-weight: 700; line-height:1.6; }
 
   .top-right-group{
-    display:flex; align-items:center; gap: 8px;
+    display:flex; flex-direction:column; align-items:flex-end; gap: 2px;
+  }
+  .top-controls{
+    display:flex; align-items:center; gap: 3px;
   }
   .scores{ display:flex; gap: 10px; flex-shrink:0; }
   .pill{
@@ -154,12 +157,13 @@
   .info{
     background: rgba(255,255,255,0.6);
     border-radius: 16px;
-    padding: 10px 14px;
+    padding: 10px 34px 10px 14px;
     font-size: 12.5px;
     color: var(--ink-soft);
     font-weight: 700;
     line-height: 1.6;
     margin: 16px 0;
+    position: relative;
   }
   .info b{ color: var(--ink); }
 
@@ -349,6 +353,49 @@
     .cute-title{ font-size:24px; }
     .start-overlay .start-icon{ font-size:42px; }
   }
+  .info{ position:relative; padding-right: 36px; }
+  .info-close{
+    position:absolute; top:8px; right:10px;
+    cursor:pointer; font-size:14px; line-height:1;
+    color:var(--ink-soft); width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%; transition:background .15s;
+  }
+  .info-close:hover{ background:rgba(128,100,160,0.15); color:var(--ink); }
+
+  .help-mask{
+    position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    display:none; justify-content:center; align-items:center;
+    z-index:999; padding:20px;
+  }
+  .help-mask.active{ display:flex; }
+  .help-box{
+    background:var(--panel); border-radius:18px;
+    padding:24px; max-width:340px; width:100%;
+    box-shadow:0 16px 48px rgba(0,0,0,0.3);
+  }
+  .help-box .hdr{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Baloo 2',sans-serif; font-size:18px; font-weight:700;
+    color:var(--ink); margin-bottom:12px;
+  }
+  .help-box .hdr .x{
+    cursor:pointer; font-size:16px; line-height:1;
+    width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+    border-radius:50%; transition:background .15s; color:var(--ink-soft);
+  }
+  .help-box .hdr .x:hover{ background:rgba(128,100,160,0.12); color:var(--ink); }
+  .help-box p{
+    font-size:14px; color:var(--ink-soft); line-height:1.8; margin-bottom:18px;
+  }
+  .help-box button{
+    background:var(--pink); color:#fff; border:none; border-radius:14px;
+    padding:9px 0; font-family:'Baloo 2',sans-serif; font-weight:700;
+    font-size:14px; cursor:pointer; width:100%;
+    box-shadow:0 4px 0 #d9628a; transition:transform .08s, box-shadow .08s;
+  }
+  .help-box button:active{ transform:translateY(2px); box-shadow:0 2px 0 #d9628a; }
+
   .footer-note{
     text-align:center; font-size: 11px; color: var(--ink-soft); margin-top: 16px; font-weight:700;
   }
@@ -367,8 +414,10 @@
           <div class="pill"><div class="k">分数</div><div class="v" id="score">0</div></div>
           <div class="pill"><div class="k">最高</div><div class="v" id="best-score">0</div></div>
         </div>
-        <div class="mute-btn" id="mute-btn">🔊</div>
-        <div class="settings-icon" id="settings-btn">⚙️</div>
+        <div class="top-controls">
+          <div class="mute-btn" id="mute-btn">🔊</div>
+          <div class="settings-icon" id="settings-btn">⚙️</div>
+        </div>
       </div>
     </div>
 
@@ -376,11 +425,24 @@
       <div class="settings-item" id="settings-restart"><span>✨</span> 重新尝试</div>
       <div class="settings-item"><span>🔊</span><input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5"></div>
       <div class="settings-item" id="settings-sfx"><span id="sfx-icon">🔔</span> 音效</div>
+      <div class="settings-item" id="settings-help"><span>❓</span> 帮助</div>
     </div>
 
     <div class="sub">从一颗糖果开始，一路合成出甜品店的招牌生日蛋糕 🎂 每个方块右下角是它的"售价"～</div>
 
     <div class="info">用<b>方向键</b>或<b>滑动屏幕</b>移动甜品，两个相同的甜品碰一起就会升级成更贵更好吃的下一款！</div>
+
+    <!-- 帮助弹窗 -->
+    <div class="help-mask" id="help-mask">
+      <div class="help-box">
+        <div class="hdr">
+          <span>💡 玩法说明</span>
+          <span class="x" id="help-close">✕</span>
+        </div>
+        <p>用<b>方向键</b>或<b>滑动屏幕</b>移动甜品，两个相同的甜品碰一起就会升级成更贵更好吃的下一款！</p>
+        <button onclick="closeHelp()">知道了</button>
+      </div>
+    </div>
 
     <button class="restart-btn" id="restart-btn" onclick="restartGame()">重新尝试 ✨</button>
 
@@ -558,6 +620,21 @@
     playButton();
     sfxEnabled = !sfxEnabled;
     document.getElementById('sfx-icon').textContent = sfxEnabled ? '\uD83D\uDD14' : '\uD83D\uDD15';
+  });
+  document.getElementById('settings-help').addEventListener('click', () => {
+    playButton();
+    document.getElementById('help-mask').classList.add('active');
+    settingsMenu.classList.remove('active');
+  });
+  function closeHelp(){
+    document.getElementById('help-mask').classList.remove('active');
+  }
+  document.getElementById('help-close').addEventListener('click', closeHelp);
+  document.getElementById('help-mask').addEventListener('click', (e) => {
+    if(e.target === e.currentTarget) closeHelp();
+  });
+  document.getElementById('info-close').addEventListener('click', () => {
+    document.getElementById('info-box').style.display = 'none';
   });
 
   // ─── Grid ───
