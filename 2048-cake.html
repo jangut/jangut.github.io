@@ -72,9 +72,20 @@
     font-family: 'Baloo 2', sans-serif;
     font-size: 30px;
     font-weight: 800;
-    color: var(--ink);
     line-height: 1.15;
-    text-shadow: 2px 3px 0 rgba(255,255,255,0.7);
+    background: linear-gradient(135deg, #ff8fb1 0%, #c44a7a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(1px 2px 2px rgba(200,100,150,0.3));
+  }
+  @media (prefers-color-scheme: dark) {
+    h1{
+      background: linear-gradient(135deg, #ffb3c6 0%, #e67a9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
   }
   .sub{ font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 18px; font-weight: 700; line-height:1.6; }
 
@@ -315,10 +326,11 @@
     transform: translateY(3px); box-shadow:0 2px 0 #d9628a;
   }
   @media (max-width:380px){
-    h1{ font-size:24px; }
+    .cute-title{ font-size:24px; }
     .pill .v{ font-size:15px; }
     .pill{ padding:5px 10px; min-width:44px; }
     .start-overlay h2{ font-size:22px; }
+    .cute-title{ font-size:24px; }
     .start-overlay .start-icon{ font-size:42px; }
   }
   .footer-note{
@@ -333,7 +345,7 @@
 
   <div class="wrap">
     <div class="topline">
-      <h1>合成<br>生日蛋糕</h1>
+      <h1 class="cute-title">🧁 合成<br>生日蛋糕 🎂</h1>
       <div class="top-right-group">
         <div class="scores">
           <div class="pill"><div class="k">分数</div><div class="v" id="score">0</div></div>
@@ -366,7 +378,7 @@
         <button onclick="startGame()">🎮 开始游戏</button>
       </div>
       <div class="overlay" id="game-over-overlay">
-        <video id="overlay-video" playsinline webkit-playsinline preload="auto"></video>
+        <video id="overlay-video" muted playsinline webkit-playsinline preload="auto" src="source/video/fail.mp4"></video>
         <button class="restart-overlay-btn" id="overlay-restart-btn" onclick="restartGame()">再开一家店 ✨</button>
       </div>
     </div>
@@ -611,6 +623,7 @@
         overlayVideo.src = 'source/video/victory.mp4';
         overlayVideo.onended = null;
         overlay.classList.add('active');
+        overlayVideo.load();
         overlayVideo.play().catch(()=>{ overlay.classList.remove('active'); });
         localStorage.setItem('2048-best', bestScore);
         setTimeout(() => {
@@ -631,7 +644,6 @@
       }
     }
     gameOver = true;
-    overlayVideo.src = 'source/video/fail.mp4';
     overlayVideo.loop = false;
     overlayVideo.onended = () => {
       overlayVideo.currentTime = overlayVideo.duration - 0.1;
@@ -644,6 +656,7 @@
 
   function restartGame(){
     playButton();
+    bgm.play().catch(()=>{});
     initBoard();
   }
 
