@@ -457,7 +457,7 @@
           <div class="spinner"></div>
           <span id="load-text">加载资源中…</span>
         </div>
-        <button id="start-btn" onclick="startGame()" disabled>🎮 开始游戏</button>
+        <button id="start-btn" onclick="startGame()">🎮 开始游戏</button>
       </div>
       <div class="overlay" id="game-over-overlay">
         <video id="overlay-video" muted playsinline webkit-playsinline preload="auto" src="source/video/fail.mp4"></video>
@@ -531,10 +531,9 @@
   ];
   RESOURCES.forEach(_preload);
 
-  // 全部下载完后启用开始按钮
+  // 下载完资源后隐藏加载提示（不阻塞界面）
   Promise.all(RESOURCES.map(_preload)).then(() => {
     document.getElementById('start-loading').style.display = 'none';
-    document.getElementById('start-btn').disabled = false;
   });
 
   // 创建Audio：先用原URL占位，blob就绪后切成blob URL
