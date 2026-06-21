@@ -518,6 +518,31 @@
   const overlayVideo = document.getElementById('overlay-video');
   const restartBtn = document.getElementById('restart-btn');
 
+  // ─── Keyboard ───
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); move('left'); }
+    else if(e.key === 'ArrowRight'){ e.preventDefault(); move('right'); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); move('up'); }
+    else if(e.key === 'ArrowDown'){ e.preventDefault(); move('down'); }
+  });
+
+  // ─── Touch ───
+  let startX, startY;
+  const gridContainer = document.getElementById('grid-container');
+  gridContainer.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+  }, {passive:true});
+  gridContainer.addEventListener('touchend', (e) => {
+    if(!startX || !startY) return;
+    let dx = e.changedTouches[0].clientX - startX;
+    let dy = e.changedTouches[0].clientY - startY;
+    if(Math.abs(dx) > Math.abs(dy)){
+      if(Math.abs(dx) > 20) move(dx > 0 ? 'right' : 'left');
+    } else {
+      if(Math.abs(dy) > 20) move(dy > 0 ? 'down' : 'up');
+    }
+    startX = null; startY = null;
+  }, {passive:true});
   // ─── 音效 ───
   let sfxEnabled = true;
   let bgmVolume = 0.3;
@@ -792,31 +817,7 @@
     initBoard();
   }
 
-  // ─── Keyboard ───
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'ArrowLeft'){ e.preventDefault(); move('left'); }
-    else if(e.key === 'ArrowRight'){ e.preventDefault(); move('right'); }
-    else if(e.key === 'ArrowUp'){ e.preventDefault(); move('up'); }
-    else if(e.key === 'ArrowDown'){ e.preventDefault(); move('down'); }
-  });
 
-  // ─── Touch ───
-  let startX, startY;
-  const gridContainer = document.getElementById('grid-container');
-  gridContainer.addEventListener('touchstart', (e) => {
-    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-  }, {passive:true});
-  gridContainer.addEventListener('touchend', (e) => {
-    if(!startX || !startY) return;
-    let dx = e.changedTouches[0].clientX - startX;
-    let dy = e.changedTouches[0].clientY - startY;
-    if(Math.abs(dx) > Math.abs(dy)){
-      if(Math.abs(dx) > 20) move(dx > 0 ? 'right' : 'left');
-    } else {
-      if(Math.abs(dy) > 20) move(dy > 0 ? 'down' : 'up');
-    }
-    startX = null; startY = null;
-  }, {passive:true});
 
   initGridBackground();
   // Don't initBoard yet — wait for start button
