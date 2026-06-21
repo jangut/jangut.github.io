@@ -423,18 +423,55 @@
   const overlayVideo = document.getElementById('overlay-video');
   const restartBtn = document.getElementById('restart-btn');
 
-  // ─── Audio ───
+  // ─── 资源下载器：页面打开时把所有媒体文件拉到内存blob ───
+  //  这样 play() 时从内存走，零网络延迟，手机也不会卡
+  const _blob = {};
+  const _loading = {};
+
+  function _preload(path) {
+    // 如果已经在下载中或已下载完，返回同一个 Promise
+    if (_loading[path]) return _loading[path];
+    if (_blob[path]) return Promise.resolve(_blob[path]);
+    _loading[path] = fetch(path)
+      .then(r => r.blob())
+      .then(b => { _blob[path] = URL.createObjectURL(b); return _blob[path]; })
+      .catch(() => { _blob[path] = path; return path; }); // 失败就用原URL
+    return _loading[path];
+  }
+  function _url(path) { return _blob[path] || path; }
+
+  // 开始下载全部7个文件
+  [
+    'source/music/BGM.mp3',
+    'source/music/bump.mp3',
+    'source/music/buttom.mp3',
+    'source/music/fail.mp3',
+    'source/music/victory.mp3',
+    'source/video/fail.mp4',
+    'source/video/victory.mp4',
+  ].forEach(_preload);
+
+  // 创建Audio：先用原URL占位，blob就绪后切成blob URL
+  function makeAudio(path) {
+    const a = new Audio(_url(path));
+    _preload(path).then(u => { if (u !== path) a.src = u; });
+    return a;
+  }
+
+  // ─── 音效状态 ───
   let sfxEnabled = true;
   let bgmVolume = 0.3;
 
-  const bgm = new Audio('source/music/BGM.mp3');
+  // BGM（背景音乐）
+  const bgm = makeAudio('source/music/BGM.mp3');
   bgm.loop = true;
   bgm.volume = bgmVolume;
 
-  const bumpSfx = new Audio('source/music/bump.mp3');
-  const buttonSfx = new Audio('source/music/buttom.mp3');
-  const failSfx = new Audio('source/music/fail.mp3');
-  const victorySfx = new Audio('source/music/victory.mp3');
+  // 其他音效
+  const bumpSfx = makeAudio('source/music/bump.mp3');   // 方块碰撞
+  const buttonSfx = makeAudio('source/music/buttom.mp3'); // 按钮点击
+  const failSfx = makeAudio('source/music/fail.mp3');     // 失败音
+  const victorySfx = makeAudio('source/music/victory.mp3');// 胜利音
 
   function playBump(){
     if(!sfxEnabled || masterMuted) return;
@@ -451,11 +488,11 @@
     bgm.volume = v;
   }
 
-  // ─── Start Game ───
+  // ─── 开始游戏（点击「开始游戏」按钮触发） ───
   function startGame(){
-    playButton();
     document.getElementById('start-overlay').classList.add('hidden');
-    bgm.play().catch(()=>{});
+    // 等BGM的blob就绪后再播（从内存播，无网络延迟）
+    _preload('source/music/BGM.mp3').then(() => bgm.play().catch(()=>{}));
     initBoard();
   }
 
@@ -514,6 +551,7 @@
     victorySfx.pause(); victorySfx.currentTime = 0;
   }
   function initBoard(){
+    // 重置棋盘、分数、恢复初始状态
     stopGameOverSounds();
     board = Array.from({length:size}, () => Array(size).fill(0));
     score = 0; gameOver = false; won = false;
@@ -571,6 +609,8 @@
     }
   }
 
+  // ─── 一行方块向左滑动、合并 ───
+  //  返回 { row: 新行, merged: 是否发生了合并 }
   function slide(row){
     let arr = row.filter(v => v !== 0);
     let merged = false;
@@ -603,6 +643,7 @@
     return res;
   }
 
+  // ─── 核心移动逻辑（上下左右滑动/按键） ───
   function move(direction){
     if(gameOver) return;
     let oldBoard = copyBoard(board);
@@ -628,24 +669,26 @@
       render();
       updateScore();
       checkGameOver();
+      // ─── 胜利！合成生日蛋糕 🎂 ───
       if(won){
         won = false;
-        bgm.pause();
-        victorySfx.currentTime = 0;
+        bgm.pause();                     // 停BGM
+        victorySfx.currentTime = 0;       // 播胜利音效
         victorySfx.play().catch(()=>{});
-        overlayVideo.src = 'source/video/victory.mp4';
+        _preload('source/video/victory.mp4').then(url => { overlayVideo.src = url; overlayVideo.load(); });
+        // 播完后定格在最后一帧，显示重试按钮
         overlayVideo.onended = () => {
           overlayVideo.currentTime = overlayVideo.duration - 0.1;
           document.getElementById('overlay-restart-btn').classList.add('show');
         };
         overlay.classList.add('active');
-        overlayVideo.load();
         overlayVideo.play().catch(()=>{ overlay.classList.remove('active'); document.getElementById('overlay-restart-btn').classList.add('show'); });
         localStorage.setItem('2048-best', bestScore);
       }
     }
   }
 
+  // ─── 检查是否游戏结束（无空格 + 无相邻可合并） ───
   function checkGameOver(){
     for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(board[r][c] === 0) return;
     for(let r=0;r<size;r++){
@@ -655,10 +698,12 @@
       }
     }
     gameOver = true;
-    bgm.pause();
-    failSfx.currentTime = 0;
+    bgm.pause();                     // 停BGM
+    failSfx.currentTime = 0;          // 播失败音效
     failSfx.play().catch(()=>{});
+    _preload('source/video/fail.mp4').then(url => { overlayVideo.src = url; overlayVideo.load(); });
     overlayVideo.loop = false;
+    // 播完后定格在最后一帧，显示重试按钮
     overlayVideo.onended = () => {
       overlayVideo.currentTime = overlayVideo.duration - 0.1;
       document.getElementById('overlay-restart-btn').classList.add('show');
