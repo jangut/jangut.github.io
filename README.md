@@ -15,8 +15,8 @@
 ---
 
 ## 访问方式
-- 线上地址：`https://jangut.github.io`
-- 仓库地址：`https://github.com/jangut/jangut.github.io`
+- 线上地址：[jangut.github.io](https://jangut.github.io)
+- 仓库地址：[github.com/jangut/jangut.github.io](https://github.com/jangut/jangut.github.io)
 
 ---
 
@@ -27,4 +27,10 @@
 
 ---
 
-最后更新：2026-06-19
+## 小项目
+
+- 🎂 [**合成生日蛋糕**](2048-cake.html) — 一个2048变种甜品合成小游戏，支持深色模式和触屏操作。
+
+---
+
+最后更新：2026-06-21
