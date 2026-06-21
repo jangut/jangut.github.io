@@ -485,6 +485,11 @@
   </div>
 
 <script>
+  // ─── 错误捕获（调试用，报错会显示在页面底部） ───
+  window._errs = [];
+  window.onerror = function(m,u,l){ window._errs.push(m+' (line '+l+')'); };
+  window.addEventListener('unhandledrejection', function(e){ window._errs.push('Promise: '+e.reason); });
+
   // ─── Board ───
   let board = [];
   let score = 0;
@@ -821,6 +826,14 @@
 
   initGridBackground();
   // Don't initBoard yet — wait for start button
+
+  // 显示 JS 报错（如有）
+  if(window._errs.length){
+    var e = document.createElement('div');
+    e.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#c44;color:#fff;padding:10px;font-size:13px;z-index:9999;font-family:monospace;';
+    e.textContent = '\u26A0\uFE0F ' + window._errs.join(' | ');
+    document.body.appendChild(e);
+  }
 </script>
 </body>
 </html>
