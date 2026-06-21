@@ -394,6 +394,26 @@
     font-size:14px; cursor:pointer; width:100%;
     box-shadow:0 4px 0 #d9628a; transition:transform .08s, box-shadow .08s;
   }
+  .help-box .help-body{
+    max-height:320px; overflow-y:auto; margin-bottom:16px;
+    scrollbar-width:thin; scrollbar-color:var(--ink-soft) transparent;
+  }
+  .help-box .help-body::-webkit-scrollbar{ width:4px; }
+  .help-box .help-body::-webkit-scrollbar-thumb{ background:var(--ink-soft); border-radius:4px; }
+  .help-box .help-body p{ font-size:14px; color:var(--ink-soft); line-height:1.8; margin-bottom:12px; }
+  .help-divider{ height:1px; background:var(--line, #e0dce8); margin:12px 0; opacity:0.4; }
+  .help-tips .tip-title{ font-weight:800; font-size:14px; color:var(--ink); margin-bottom:8px; }
+  .help-tips ul{ list-style:none; padding:0; margin:0; }
+  .help-tips li{
+    position:relative; padding:5px 0 5px 16px;
+    font-size:13px; color:var(--ink-soft); line-height:1.6;
+  }
+  .help-tips li::before{
+    content:'•'; position:absolute; left:2px;
+    color:var(--pink); font-weight:800; font-size:15px;
+  }
+  .help-tips li .hl{ color:var(--pink); font-weight:700; }
+
   .help-box button:active{ transform:translateY(2px); box-shadow:0 2px 0 #d9628a; }
 
   .footer-note{
@@ -439,7 +459,20 @@
           <span>💡 玩法说明</span>
           <span class="x" id="help-close">✕</span>
         </div>
-        <p>用<b>方向键</b>或<b>滑动屏幕</b>移动甜品，两个相同的甜品碰一起就会升级成更贵更好吃的下一款！</p>
+        <div class="help-body">
+          <p>用<b>方向键</b>或<b>滑动屏幕</b>移动甜品，两个相同的甜品碰一起就会升级成更贵更好吃的下一款！</p>
+          <div class="help-divider"></div>
+          <div class="help-tips">
+            <div class="tip-title">💡 进阶技巧</div>
+            <ul>
+              <li>把最大数字<strong>定在一个角落</strong>（推荐左下或右下），始终往那个方向堆</li>
+              <li>优先保持<strong>一行或一列排满</strong>，避免打乱阵型</li>
+              <li>尽量<strong>单向滑动</strong>，比如只用 ↓ 和 ←，少用 ↑ 和 →</li>
+              <li>提前<span class="hl">两三步预判</span>合成路线，别只看当前一步</li>
+              <li>格子快满时先<strong>消小数字腾空间</strong>，别急着做大数</li>
+            </ul>
+          </div>
+        </div>
         <button onclick="closeHelp()">知道了</button>
       </div>
     </div>
