@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -16,6 +16,25 @@
     --pink: #ff8fb1;
     --shadow: rgba(150, 120, 170, 0.25);
   }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-a: #1a1625;
+      --bg-b: #231e30;
+      --panel: #2d2640;
+      --ink: #e8e0f0;
+      --ink-soft: #9a8db0;
+      --pink: #e67a9f;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+    .blob { opacity: 0.15; }
+    .blob.b1 { background: #2a1f35; }
+    .blob.b2 { background: #1f2e2a; }
+    .blob.b3 { background: #1a2535; }
+    .info { background: rgba(45, 38, 64, 0.7); }
+    .grid-cell { background: #221c30; }
+    .tile .price { background: #1a1625; border-color: #2d2640; color: #e8e0f0; }
+  }
+
   *{ margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none; }
   body{
     min-height: 100vh;
@@ -59,6 +78,9 @@
   }
   .sub{ font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 18px; font-weight: 700; line-height:1.6; }
 
+  .top-right-group{
+    display:flex; align-items:center; gap: 8px;
+  }
   .scores{ display:flex; gap: 10px; flex-shrink:0; }
   .pill{
     background: var(--panel);
@@ -70,6 +92,43 @@
   }
   .pill .k{ font-size: 10px; color: var(--ink-soft); font-weight:800; letter-spacing: .5px; }
   .pill .v{ font-family:'Baloo 2',sans-serif; font-size: 18px; font-weight: 700; color: var(--pink); }
+
+  .settings-icon{
+    font-size: 22px; cursor: pointer; line-height: 1;
+    transition: transform .3s;
+    filter: drop-shadow(0 2px 0 var(--shadow));
+  }
+  .settings-icon:hover{ transform: rotate(60deg); }
+  .settings-menu{
+    display: none;
+    position: absolute;
+    top: 44px;
+    right: 0;
+    background: var(--panel);
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    padding: 6px;
+    z-index: 200;
+    min-width: 175px;
+  }
+  .settings-menu.active{ display: block; }
+  .settings-item{
+    padding: 9px 14px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .15s;
+  }
+  .settings-item:hover{ background: rgba(128,100,160,0.1); }
+  .settings-item input[type="range"]{
+    width: 80px; height: 4px; accent-color: var(--pink);
+  }
 
   .info{
     background: rgba(255,255,255,0.6);
@@ -84,6 +143,7 @@
   .info b{ color: var(--ink); }
 
   .restart-btn{
+    display: none;
     width: 100%;
     background: var(--pink);
     color: #fff;
@@ -100,6 +160,7 @@
     transition: transform .08s, box-shadow .08s;
   }
   .restart-btn:active{ transform: translateY(4px); box-shadow: 0 2px 0 #d9628a; }
+  .restart-btn.show{ display: block; }
 
   .grid-container{
     background: var(--panel);
@@ -135,7 +196,7 @@
     box-shadow: inset 0 -4px 0 rgba(0,0,0,0.08), inset 0 3px 0 rgba(255,255,255,0.5);
   }
   .tile .dessert{
-    font-size: 30px;
+    font-size: 32px;
     line-height: 1;
     filter: drop-shadow(0 2px 1px rgba(0,0,0,0.12));
   }
@@ -147,15 +208,14 @@
     color: var(--ink);
     font-family: 'Baloo 2', sans-serif;
     font-weight: 700;
-    font-size: 9.5px;
-    padding: 1.5px 5px;
-    border-radius: 8px;
+    font-size: 10.5px;
+    padding: 2px 6px;
+    border-radius: 9px;
     border: 1.5px solid #f0e6f7;
     box-shadow: 0 2px 0 rgba(150,120,170,0.2);
     transform: rotate(-6deg);
   }
 
-  /* tray colors behind each dessert tier */
   .tile-2{ background:#cdeede; }
   .tile-4{ background:#bfe3ff; }
   .tile-8{ background:#ffe1b3; }
@@ -167,7 +227,7 @@
   .tile-512{ background:#bf8fff; }
   .tile-1024{ background:#8f7aff; }
   .tile-2048{ background: linear-gradient(135deg,#ffd34d,#ff8fb1); box-shadow: 0 0 0 3px #fff, 0 0 16px rgba(255,143,177,0.6), inset 0 -4px 0 rgba(0,0,0,0.08), inset 0 3px 0 rgba(255,255,255,0.5); }
-  .tile-2048 .dessert{ font-size: 32px; }
+  .tile-2048 .dessert{ font-size: 34px; }
 
   @keyframes squish{
     0%{ transform: scale(0.5); }
@@ -179,31 +239,18 @@
 
   .overlay{
     position:absolute; inset:0;
-    background: rgba(255,244,237,0.94);
-    display:none; flex-direction:column; justify-content:center; align-items:center;
-    border-radius: 22px; z-index: 100;
-    text-align: center;
-    padding: 0 20px;
+    border-radius: 22px;
+    z-index: 100;
+    overflow: hidden;
+    display: none;
   }
-  .overlay.active{ display:flex; }
-  .overlay .big-emoji{ font-size: 50px; margin-bottom: 6px; }
-  .overlay h2{
-    font-family: 'Baloo 2', sans-serif;
-    font-size: 24px;
-    margin-bottom: 18px;
-    color: var(--ink);
-  }
-  .overlay button{
-    background: var(--pink);
-    color: #fff;
-    border: none;
-    font-family: 'Baloo 2', sans-serif;
-    font-weight: 700;
-    padding: 11px 26px;
-    border-radius: 18px;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 5px 0 #d9628a;
+  .overlay.active{ display: block; }
+  .overlay video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
   }
 
   .footer-note{
@@ -219,24 +266,32 @@
   <div class="wrap">
     <div class="topline">
       <h1>合成<br>生日蛋糕</h1>
-      <div class="scores">
-        <div class="pill"><div class="k">分数</div><div class="v" id="score">0</div></div>
-        <div class="pill"><div class="k">最高</div><div class="v" id="best-score">0</div></div>
+      <div class="top-right-group">
+        <div class="scores">
+          <div class="pill"><div class="k">分数</div><div class="v" id="score">0</div></div>
+          <div class="pill"><div class="k">最高</div><div class="v" id="best-score">0</div></div>
+        </div>
+        <div class="settings-icon" id="settings-btn">⚙️</div>
       </div>
     </div>
+
+    <div class="settings-menu" id="settings-menu">
+      <div class="settings-item" id="settings-restart"><span>✨</span> 开张营业</div>
+      <div class="settings-item"><span>🔊</span><input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5"></div>
+      <div class="settings-item" id="settings-sfx"><span id="sfx-icon">🔔</span> 音效</div>
+    </div>
+
     <div class="sub">从一颗糖果开始，一路合成出甜品店的招牌生日蛋糕 🎂 每个方块右下角是它的"售价"～</div>
 
     <div class="info">用<b>方向键</b>或<b>滑动屏幕</b>移动甜品，两个相同的甜品碰一起就会升级成更贵更好吃的下一款！</div>
 
-    <button class="restart-btn" onclick="restartGame()">开张营业 ✨</button>
+    <button class="restart-btn" id="restart-btn" onclick="restartGame()">开张营业 ✨</button>
 
     <div class="grid-container" id="grid-container">
       <div class="grid-background" id="grid-background"></div>
       <div class="tiles-container" id="tiles-container"></div>
       <div class="overlay" id="game-over-overlay">
-        <div class="big-emoji" id="overlay-emoji">🎂</div>
-        <h2 id="overlay-title">生日蛋糕做好啦！</h2>
-        <button onclick="restartGame()">再开一家店</button>
+        <video id="overlay-video" muted playsinline preload="auto"></video>
       </div>
     </div>
 
@@ -244,40 +299,99 @@
   </div>
 
 <script>
+  // ─── Board ───
   let board = [];
   let score = 0;
   let bestScore = 0;
   let gameOver = false;
   let won = false;
   const size = 4;
-  const GAP = 10; // must match .grid-background gap and tiles-container inset
+  const GAP = 10;
 
-  // dessert progression: value -> { emoji, name }
   const DESSERTS = {
-    2:    { e: '🍬', n: '水果糖' },
-    4:    { e: '🍭', n: '棒棒糖' },
-    8:    { e: '🍪', n: '曲奇饼干' },
-    16:   { e: '🧇', n: '华夫饼' },
-    32:   { e: '🍩', n: '甜甜圈' },
-    64:   { e: '🧁', n: '纸杯蛋糕' },
-    128:  { e: '🍮', n: '布丁' },
-    256:  { e: '🥧', n: '水果派' },
-    512:  { e: '🍫', n: '巧克力蛋糕' },
-    1024: { e: '🍰', n: '芝士蛋糕' },
-    2048: { e: '🎂', n: '生日蛋糕' },
+    2:    { e: '\uD83C\uDF6C', n: '\u6C34\u679C\u7CD6' },
+    4:    { e: '\uD83C\uDF6D', n: '\u68D2\u68D2\u7CD6' },
+    8:    { e: '\uD83C\uDF6A', n: '\u66F2\u5947\u997C\u5E72' },
+    16:   { e: '\uD83E\uDDC7', n: '\u534E\u592B\u997C' },
+    32:   { e: '\uD83C\uDF69', n: '\u751C\u751C\u5708' },
+    64:   { e: '\uD83E\uDDC1', n: '\u7EB8\u676F\u86CB\u7CD5' },
+    128:  { e: '\uD83C\uDF6E', n: '\u5E03\u4E01' },
+    256:  { e: '\uD83E\uDD67', n: '\u6C34\u679C\u6D3E' },
+    512:  { e: '\uD83C\uDF6B', n: '\u5DE7\u514B\u529B\u86CB\u7CD5' },
+    1024: { e: '\uD83C\uDF70', n: '\u829D\u58EB\u86CB\u7CD5' },
+    2048: { e: '\uD83C\uDF82', n: '\u751F\u65E5\u86CB\u7CD5' },
   };
-  function dessertFor(val){
-    return DESSERTS[val] || DESSERTS[2048];
-  }
+  function dessertFor(val){ return DESSERTS[val] || DESSERTS[2048]; }
 
+  // ─── DOM refs ───
   const tilesContainer = document.getElementById('tiles-container');
   const gridBackground = document.getElementById('grid-background');
   const scoreElement = document.getElementById('score');
   const bestScoreElement = document.getElementById('best-score');
   const overlay = document.getElementById('game-over-overlay');
-  const overlayTitle = document.getElementById('overlay-title');
-  const overlayEmoji = document.getElementById('overlay-emoji');
+  const overlayVideo = document.getElementById('overlay-video');
+  const restartBtn = document.getElementById('restart-btn');
 
+  // ─── Audio ───
+  let sfxEnabled = true;
+  let bgmVolume = 0.3;
+
+  const bgm = new Audio('source/music/BGM.mp3');
+  bgm.loop = true;
+  bgm.volume = bgmVolume;
+
+  const bumpSfx = new Audio('source/music/bump.mp3');
+  const buttonSfx = new Audio('source/music/buttom.mp3');
+
+  function playBump(){
+    if(!sfxEnabled) return;
+    bumpSfx.currentTime = 0;
+    bumpSfx.play().catch(()=>{});
+  }
+  function playButton(){
+    if(!sfxEnabled) return;
+    buttonSfx.currentTime = 0;
+    buttonSfx.play().catch(()=>{});
+  }
+  function setVolume(v){
+    bgmVolume = v;
+    bgm.volume = v;
+  }
+
+  // Start BGM on first tap
+  document.addEventListener('click', function _first(){
+    bgm.play().catch(()=>{});
+  }, { once: true });
+
+  // ─── Settings UI ───
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsMenu = document.getElementById('settings-menu');
+  const volumeSlider = document.getElementById('volume-slider');
+
+  settingsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    settingsMenu.classList.toggle('active');
+  });
+  document.addEventListener('click', () => {
+    settingsMenu.classList.remove('active');
+  });
+  settingsMenu.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  document.getElementById('settings-restart').addEventListener('click', () => {
+    settingsMenu.classList.remove('active');
+    restartGame();
+  });
+  volumeSlider.addEventListener('input', (e) => {
+    setVolume(parseFloat(e.target.value));
+  });
+  document.getElementById('settings-sfx').addEventListener('click', (e) => {
+    sfxEnabled = !sfxEnabled;
+    document.getElementById('sfx-icon').textContent = sfxEnabled ? '\uD83D\uDD14' : '\uD83D\uDD15';
+  });
+
+  // ─── Grid ───
   function initGridBackground(){
     gridBackground.innerHTML = '';
     for(let i=0;i<size*size;i++){
@@ -291,10 +405,15 @@
     board = Array.from({length:size}, () => Array(size).fill(0));
     score = 0; gameOver = false; won = false;
     overlay.classList.remove('active');
+    overlayVideo.pause();
+    overlayVideo.currentTime = 0;
+    restartBtn.classList.remove('show');
     addRandomTile();
     addRandomTile();
     render();
     updateScore();
+    const saved = localStorage.getItem('2048-best');
+    if(saved){ bestScore = parseInt(saved,10) || 0; bestScoreElement.innerText = bestScore; }
   }
 
   function addRandomTile(){
@@ -306,8 +425,6 @@
     }
   }
 
-  // position stride uses the same (100% - 3*gap)/4 base as the tile width,
-  // so tiles line up exactly with the background cells at every column/row.
   function tilePos(i){
     return `calc(${i} * (100% - ${3*GAP}px) / 4 + ${i*GAP}px)`;
   }
@@ -322,7 +439,7 @@
           const cls = val <= 2048 ? val : 2048;
           const d = dessertFor(val);
           tile.className = `tile tile-${cls} new-tile`;
-          tile.innerHTML = `<div class="dessert">${d.e}</div><div class="price">¥${val}</div>`;
+          tile.innerHTML = `<div class="dessert">${d.e}</div><div class="price">\u00A5${val}</div>`;
           tile.title = d.n;
           tile.style.top = tilePos(r);
           tile.style.left = tilePos(c);
@@ -334,31 +451,33 @@
 
   function updateScore(){
     scoreElement.innerText = score;
-    if(score > bestScore) bestScore = score;
-    bestScoreElement.innerText = bestScore;
+    if(score > bestScore){
+      bestScore = score;
+      bestScoreElement.innerText = bestScore;
+    }
   }
 
   function slide(row){
     let arr = row.filter(v => v !== 0);
+    let merged = false;
     for(let i=0;i<arr.length-1;i++){
       if(arr[i] === arr[i+1]){
         arr[i] *= 2;
         score += arr[i];
         if(arr[i] === 2048 && !won) won = true;
         arr.splice(i+1,1);
+        merged = true;
       }
     }
     while(arr.length < size) arr.push(0);
-    return arr;
+    return { row: arr, merged };
   }
 
   function copyBoard(b){ return b.map(row => [...row]); }
-
   function isChanged(a,b){
     for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(a[r][c] !== b[r][c]) return true;
     return false;
   }
-
   function rotateLeft(m){
     let res = Array.from({length:size}, () => Array(size).fill(0));
     for(let r=0;r<size;r++) for(let c=0;c<size;c++) res[size-1-c][r] = m[r][c];
@@ -374,23 +493,39 @@
     if(gameOver) return;
     let oldBoard = copyBoard(board);
     let newBoard = copyBoard(board);
-    if(direction === 'left'){ newBoard = newBoard.map(slide); }
-    else if(direction === 'right'){ newBoard = newBoard.map(row => slide(row.reverse()).reverse()); }
-    else if(direction === 'up'){ newBoard = rotateLeft(newBoard); newBoard = newBoard.map(slide); newBoard = rotateRight(newBoard); }
-    else if(direction === 'down'){ newBoard = rotateLeft(newBoard); newBoard = newBoard.map(row => slide(row.reverse()).reverse()); newBoard = rotateRight(newBoard); }
-
+    let anyMerge = false;
+    if(direction === 'left'){
+      newBoard = newBoard.map(r => { const rs = slide(r); if(rs.merged) anyMerge = true; return rs.row; });
+    } else if(direction === 'right'){
+      newBoard = newBoard.map(r => { const rs = slide(r.reverse()); if(rs.merged) anyMerge = true; return rs.row.reverse(); });
+    } else if(direction === 'up'){
+      newBoard = rotateLeft(newBoard);
+      newBoard = newBoard.map(r => { const rs = slide(r); if(rs.merged) anyMerge = true; return rs.row; });
+      newBoard = rotateRight(newBoard);
+    } else if(direction === 'down'){
+      newBoard = rotateLeft(newBoard);
+      newBoard = newBoard.map(r => { const rs = slide(r.reverse()); if(rs.merged) anyMerge = true; return rs.row.reverse(); });
+      newBoard = rotateRight(newBoard);
+    }
     if(isChanged(oldBoard, newBoard)){
       board = newBoard;
+      if(anyMerge) playBump();
       addRandomTile();
       render();
       updateScore();
       checkGameOver();
       if(won){
-        overlayEmoji.innerText = '🎂';
-        overlayTitle.innerText = "生日蛋糕做好啦！🎉";
-        overlay.classList.add('active');
         won = false;
-        setTimeout(() => { if(!gameOver) overlay.classList.remove('active'); }, 1800);
+        overlayVideo.src = 'source/video/victory.mp4';
+        overlayVideo.onended = null;
+        overlay.classList.add('active');
+        overlayVideo.play().catch(()=>{});
+        localStorage.setItem('2048-best', bestScore);
+        setTimeout(() => {
+          overlay.classList.remove('active');
+          overlayVideo.pause();
+          overlayVideo.currentTime = 0;
+        }, 1800);
       }
     }
   }
@@ -404,13 +539,22 @@
       }
     }
     gameOver = true;
-    overlayEmoji.innerText = '🥺';
-    overlayTitle.innerText = "甜品店打烊啦~";
+    overlayVideo.src = 'source/video/fail.mp4';
+    overlayVideo.loop = false;
+    overlayVideo.onended = () => {
+      overlayVideo.currentTime = overlayVideo.duration - 0.1;
+    };
     overlay.classList.add('active');
+    overlayVideo.play().catch(()=>{});
+    restartBtn.classList.add('show');
   }
 
-  function restartGame(){ initBoard(); }
+  function restartGame(){
+    playButton();
+    initBoard();
+  }
 
+  // ─── Keyboard ───
   document.addEventListener('keydown', (e) => {
     if(e.key === 'ArrowLeft'){ e.preventDefault(); move('left'); }
     else if(e.key === 'ArrowRight'){ e.preventDefault(); move('right'); }
@@ -418,6 +562,7 @@
     else if(e.key === 'ArrowDown'){ e.preventDefault(); move('down'); }
   });
 
+  // ─── Touch ───
   let startX, startY;
   const gridContainer = document.getElementById('grid-container');
   gridContainer.addEventListener('touchstart', (e) => {
