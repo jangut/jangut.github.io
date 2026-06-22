@@ -55,12 +55,12 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 .song-card:hover::before{opacity:.13;}
 .song-card.selected{border-color:var(--cc,var(--accent));
   background:color-mix(in srgb,var(--cc,var(--accent)) 9%,var(--surface));}
-.card-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.card-title{font-size:1.05rem;font-weight:700;}
+.card-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;}
+.card-title{font-size:1.15rem;font-weight:700;}
 .card-badge{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;
   background:var(--cc,var(--accent));color:#fff;opacity:.85;margin-left:auto;}
-.card-meta{font-size:.7rem;color:var(--muted);display:flex;gap:10px;}
-.song-preview{margin-top:9px;height:26px;display:flex;align-items:flex-end;gap:2px;}
+.card-meta{font-size:.75rem;color:var(--muted);display:flex;gap:10px;justify-content:center;}
+.song-preview{margin-top:10px;height:30px;display:flex;align-items:flex-end;gap:2px;justify-content:center;}
 .preview-bar{flex:1;border-radius:2px 2px 0 0;background:var(--cc,var(--accent));opacity:.5;
   transition:opacity .18s;}
 .song-card:hover .preview-bar,.song-card.selected .preview-bar{opacity:.9;}
@@ -106,7 +106,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 #screen-game::before{content:"";position:absolute;inset:0;
   background:radial-gradient(ellipse at 50% 80%,rgba(192,132,252,0.08) 0%,transparent 60%);
   animation:bgPulse 4s ease-in-out infinite alternate;pointer-events:none;z-index:0;}
-#screen-game{background:#07070f;}
+#screen-game{touch-action:none;background:#07070f;}
 #game-hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;
   justify-content:space-between;padding:10px 16px;z-index:20;pointer-events:none;}
 #hud-left{display:flex;flex-direction:column;}
@@ -890,7 +890,9 @@ if(window._errs.length){
   document.body.appendChild(e);
 }
 
-// 侧滑返回：游戏内左边缘右滑 → 回选歌
+// 阻止系统返回手势
+  gs.addEventListener('touchstart',function(e){if(e.touches[0].clientX<30)e.preventDefault();},{passive:false});
+  // 侧滑返回：游戏内左边缘右滑 → 回选歌
 (function(){
   let sx=0,sy=0,swiping=false;
   const gs=document.getElementById("screen-game");
