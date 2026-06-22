@@ -44,7 +44,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 
 /* song cards */
 .song-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:18px 22px 16px;cursor:pointer;transition:border-color .18s,background .18s,transform .1s;
+  padding:20px 22px 18px;cursor:pointer;transition:border-color .18s,background .18s,transform .1s;
   position:relative;overflow:hidden;}
 .song-card::before{content:'';position:absolute;inset:0;
   background:linear-gradient(120deg,transparent 60%,var(--cc,#c084fc) 200%);
@@ -54,11 +54,11 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 .song-card.selected{border-color:var(--cc,var(--accent));
   background:color-mix(in srgb,var(--cc,var(--accent)) 9%,var(--surface));}
 .card-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;}
-.card-title{font-size:1.2rem;font-weight:700;}
+.card-title{font-size:1.25rem;font-weight:700;}
 .card-badge{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;
   background:var(--cc,var(--accent));color:#fff;opacity:.85;margin-left:auto;}
 .card-meta{font-size:.75rem;color:var(--muted);display:flex;gap:10px;justify-content:center;}
-.song-preview{height:auto;min-height:24px;display:flex;align-items:flex-end;gap:1.5px;justify-content:center;}
+.song-preview{margin-top:10px;height:auto;min-height:28px;display:flex;align-items:flex-end;gap:1.5px;justify-content:center;}
 .song-preview:empty{margin-top:0;display:none;}
 .preview-bar{flex:1;border-radius:2px 2px 0 0;background:var(--cc,var(--accent));opacity:.5;
   transition:opacity .18s;max-height:28px;}
