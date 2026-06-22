@@ -43,8 +43,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 .sel-panel.active{display:flex;}
 
 /* song cards */
+/* ── SONG CARDS ── */
 .song-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:20px 22px 18px;cursor:pointer;transition:border-color .18s,background .18s,transform .1s;
+  padding:20px 22px 18px;  /* top/left/right/bottom — 调大这个让卡片更高 */
+  cursor:pointer;transition:border-color .18s,background .18s,transform .1s;
   position:relative;overflow:hidden;}
 .song-card::before{content:'';position:absolute;inset:0;
   background:linear-gradient(120deg,transparent 60%,var(--cc,#c084fc) 200%);
@@ -54,23 +56,25 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 .song-card.selected{border-color:var(--cc,var(--accent));
   background:color-mix(in srgb,var(--cc,var(--accent)) 9%,var(--surface));}
 .card-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;}
-.card-title{font-size:1.25rem;font-weight:700;}
+.card-title{font-size:1.25rem;font-weight:700;}  /* 歌名字号 */
 .card-badge{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;
   background:var(--cc,var(--accent));color:#fff;opacity:.85;margin-left:auto;}
 .card-meta{font-size:.75rem;color:var(--muted);display:flex;gap:10px;justify-content:center;}
 .song-preview{margin-top:10px;height:auto;min-height:28px;display:flex;align-items:flex-end;gap:1.5px;justify-content:center;}
 .song-preview:empty{margin-top:0;display:none;}
 .preview-bar{flex:1;border-radius:2px 2px 0 0;background:var(--cc,var(--accent));opacity:.5;
-  transition:opacity .18s;max-height:28px;}
+  transition:opacity .18s;max-height:28px;}  /* 预览条最高 28px */
 .song-card:hover .preview-bar,.song-card.selected .preview-bar{opacity:.9;}
+/* ── 分类标题（如"国风""流行"） — 纯文字，不是卡片 ── */
 .cat-header{font-size:.7rem;font-weight:700;color:var(--muted);
-  letter-spacing:.1em;padding:16px 48px 4px 18px;text-transform:uppercase;
+  letter-spacing:.1em;padding:16px 48px 4px 18px;  /* 右空 48px 给底线留空间 */
+  text-transform:uppercase;
   position:relative;}
 .cat-header::before{content:'';position:absolute;left:18px;top:50%;margin-top:-1px;
-  width:6px;height:2px;border-radius:1px;background:var(--accent);opacity:.5;}
+  width:6px;height:2px;border-radius:1px;background:var(--accent);opacity:.5;}  /* 左侧紫色短竖 */
 .cat-header::after{content:'';position:absolute;left:30px;right:18px;bottom:3px;
-  height:1px;background:var(--border);}
-.song-card{margin-left:28px;}
+  height:1px;background:var(--border);}  /* 分类底线 */
+.song-card{margin-left:28px;}  /* 卡片左缩进，与分类标题区分层级 */
 
 /* ── SETTINGS PANEL ── */
 .settings-section{background:var(--surface);border:1px solid var(--border);
