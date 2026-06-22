@@ -205,6 +205,7 @@ canvas{width:100%;height:100%;display:block;}
   <div class="sel-tabs">
     <button class="sel-tab active" data-tab="songs">选歌</button>
     <button class="sel-tab" data-tab="settings">设置</button>
+    <button class="sel-tab" data-tab="help">帮助</button>
   </div>
   <div id="tab-songs" class="sel-panel active"></div>
   <div id="tab-settings" class="sel-panel">
@@ -308,18 +309,19 @@ window.addEventListener("unhandledrejection",function(e){window._errs.push("Prom
 // ════════════════════════════════════════════════
 //  SONGS
 // ════════════════════════════════════════════════
-const SONGS = {
-  twinkle:{
-    name:'小星星',cat:'入门',bpm:108,diff:'入门',color:'#c084fc',
-    notes:[
-      ['C4',1],['C4',1],['G4',1],['G4',1],['A4',1],['A4',1],['G4',2],
-      ['F4',1],['F4',1],['E4',1],['E4',1],['D4',1],['D4',1],['C4',2],
-      ['G4',1],['G4',1],['F4',1],['F4',1],['E4',1],['E4',1],['D4',2],
-      ['G4',1],['G4',1],['F4',1],['F4',1],['E4',1],['E4',1],['D4',2],
-      ['C4',1],['C4',1],['G4',1],['G4',1],['A4',1],['A4',1],['G4',2],
-      ['F4',1],['F4',1],['E4',1],['E4',1],['D4',1],['D4',1],['C4',2],
-    ]
-  },
+const SONGS = {};
+// 从 music.txt 加载歌曲
+async function loadSongs(){
+  try {
+    const res = await fetch('../source/music.txt');
+    const data = await res.json();
+    Object.assign(SONGS, data);
+  } catch(e) {
+    console.warn('music.txt not found, using default songs');
+  }
+  document.getElementById('load-overlay').classList.add('hidden');
+  buildSongList();
+},
   ode:{
     name:'欢乐颂',cat:'经典',bpm:100,diff:'普通',color:'#38bdf8',
     notes:[
@@ -330,7 +332,7 @@ const SONGS = {
     ]
   },
   jingle:{
-    name:'铃儿响叮当',bpm:128,diff:'较难',color:'#fb7185',
+    name:'铃儿响叮当',cat:'入门',bpm:128,diff:'较难',color:'#fb7185',
     notes:[
       ['E4',1],['E4',1],['E4',2],['E4',1],['E4',1],['E4',2],
       ['E4',1],['G4',1],['C4',1],['D4',1],['E4',4],
@@ -344,7 +346,7 @@ const SONGS = {
     ]
   },
   canon:{
-    name:'卡农主题',bpm:96,diff:'普通',color:'#4ade80',
+    name:'卡农主题',cat:'经典',bpm:96,diff:'普通',color:'#4ade80',
     notes:[
       ['D4',2],['A3',2],['B3',2],['F#3',2],
       ['G3',2],['D3',2],['G3',2],['A3',2],
@@ -436,6 +438,118 @@ const SONGS = {
       ['E5',1],['C5',1],['A4',1],['F4',1],
       ['D4',.5],['F4',.5],['A4',.5],['C5',.5],['B4',.5],['A4',.5],['F4',.5],['D4',.5],
       ['C4',4],
+    ]
+  },
+  // ── 欢乐颂 ──
+  ode:{
+    name:'欢乐颂',cat:'经典',bpm:100,diff:'普通',color:'#fbbf24',
+    notes:[
+      ['E4',1],['E4',1],['F4',1],['G4',1],['G4',1],['F4',1],['E4',1],['D4',1],
+      ['C4',1],['C4',1],['D4',1],['E4',1],['E4',.5],['D4',.5],['D4',2],
+    ]
+  },
+  // ── 绿袖子 ──
+  greensleeves:{
+    name:'绿袖子',cat:'经典',bpm:90,diff:'普通',color:'#4ade80',
+    notes:[
+      ['G4',1],['A4',1],['G4',.5],['E4',.5],['D4',1],['E4',.5],['F4',.5],
+      ['G4',1],['A4',1],['G4',.5],['E4',.5],['D4',1],['C4',1],
+    ]
+  },
+  // ── 童话 ──
+  fairy:{
+    name:'童话',bpm:105,diff:'普通',color:'#f472b6',
+    notes:[
+      ['C4',.5],['E4',.5],['G4',.5],['A4',1],['G4',.5],['E4',.5],
+      ['C4',.5],['D4',.5],['E4',.5],['F4',1],['E4',.5],['D4',.5],
+    ]
+  },
+  // ── 晴天 ──
+  sunny:{
+    name:'晴天',cat:'流行',bpm:110,diff:'普通',color:'#38bdf8',
+    notes:[
+      ['G4',.5],['A4',.5],['B4',1],['C5',.5],['D5',.5],
+      ['E5',.5],['D5',.5],['C5',.5],['B4',.5],['A4',.5],['G4',1],
+    ]
+  },
+  // ── 简单爱 ──
+  simple:{
+    name:'简单爱',cat:'流行',bpm:108,diff:'普通',color:'#84cc16',
+    notes:[
+      ['C4',.5],['E4',.5],['G4',.5],['A4',1],['C5',.5],['A4',.5],
+      ['G4',.5],['E4',.5],['D4',.5],['C4',.5],['D4',.5],['E4',.5],
+    ]
+  },
+  // ── 生日快乐 ──
+  birthday:{
+    name:'生日快乐',cat:'入门',bpm:120,diff:'入门',color:'#f472b6',
+    notes:[
+      ['C4',.5],['C4',.5],['D4',1],['C4',1],['F4',1],['E4',2],
+      ['C4',.5],['C4',.5],['D4',1],['C4',1],['G4',1],['F4',2],
+    ]
+  },
+  // ── 夜曲 ──
+  nocturne:{
+    name:'夜曲',cat:'流行',bpm:96,diff:'困难',color:'#a78bfa',
+    notes:[
+      ['A4',.5],['C5',.5],['E5',.5],['F5',1],['E5',.5],['C5',.5],
+      ['A4',.5],['C5',.5],['E5',.5],['F5',.5],['E5',.5],['D5',.5],
+    ]
+  },
+  // ── 七里香 ──
+  osmanthus:{
+    name:'七里香',cat:'国风',bpm:112,diff:'普通',color:'#fb923c',
+    notes:[
+      ['G4',.5],['A4',.5],['C5',.5],['D5',.5],['C5',.5],['A4',.5],
+      ['G4',.5],['E4',.5],['G4',.5],['A4',.5],['C5',.5],['D5',.5],
+    ]
+  },
+  // ── 海阔天空 ──
+  beyond:{
+    name:'海阔天空',cat:'摇滚',bpm:78,diff:'困难',color:'#f87171',
+    notes:[
+      ['C4',1],['E4',1],['G4',1],['A4',1],
+      ['G4',.5],['E4',.5],['D4',.5],['C4',.5],['D4',.5],['E4',.5],
+    ]
+  },
+  // ── 光辉岁月 ──
+  glory:{
+    name:'光辉岁月',cat:'摇滚',bpm:80,diff:'困难',color:'#eab308',
+    notes:[
+      ['E4',.5],['F#4',.5],['G4',.5],['A4',1],['C5',.5],['B4',.5],
+      ['A4',.5],['G4',.5],['F#4',.5],['E4',.5],['D4',.5],['E4',.5],
+    ]
+  },
+  // ── 真的爱你 ──
+  loveu:{
+    name:'真的爱你',cat:'摇滚',bpm:82,diff:'普通',color:'#fb7185',
+    notes:[
+      ['C4',.5],['E4',.5],['G4',.5],['A4',1],['C5',.5],['A4',.5],
+      ['G4',.5],['E4',.5],['D4',.5],['C4',.5],['E4',.5],['G4',.5],
+    ]
+  },
+  // ── 小幸运 ──
+  luck:{
+    name:'小幸运',cat:'流行',bpm:108,diff:'普通',color:'#a78bfa',
+    notes:[
+      ['C4',.5],['E4',.5],['G4',.5],['A4',1],['G4',.5],['E4',.5],
+      ['C4',.5],['D4',.5],['E4',.5],['F4',.5],['G4',.5],['A4',.5],
+    ]
+  },
+  // ── 追光者 ──
+  chaser:{
+    name:'追光者',cat:'流行',bpm:105,diff:'普通',color:'#93c5fd',
+    notes:[
+      ['C4',.5],['E4',.5],['G4',1],['A4',.5],['C5',.5],
+      ['B4',.5],['A4',.5],['G4',.5],['E4',.5],['D4',.5],['C4',.5],
+    ]
+  },
+  // ── 平凡之路 ──
+  road:{
+    name:'平凡之路',cat:'摇滚',bpm:104,diff:'普通',color:'#64748b',
+    notes:[
+      ['A4',.5],['C5',.5],['E5',.5],['F5',1],['E5',.5],['C5',.5],
+      ['A4',.5],['C5',.5],['E5',.5],['F5',.5],['E5',.5],['D5',.5],
     ]
   }
 };
@@ -844,7 +958,7 @@ let selectedSong='twinkle';
 function buildSongList(){
   const list=document.getElementById("tab-songs");
   list.innerHTML="";
-  const order=["入门","国风","流行","摇滚","经典"];
+  const order=["入门","国风","流行","摇滚","经典","其他"];
   const groups={};
   for(const [key,song] of Object.entries(SONGS)){
     const cat=song.cat||"其他";
