@@ -613,8 +613,8 @@
         <div class="folder open">
           <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 控制理论</button>
           <ul class="files">
-            <li><a href="#" data-md="source/document/数学模型.md"><span class="file-dot">·</span>数学模型</a></li>
-            <li><a href="#" data-md="source/document/theory.md"><span class="file-dot">·</span>控制理论入门</a></li>
+            <li><a href="#" data-md="source/document/数学模型.md" data-folder="控制理论" data-file="数学模型"><span class="file-dot">·</span>数学模型</a></li>
+            <li><a href="#" data-md="source/document/theory.md" data-folder="控制理论" data-file="控制理论入门"><span class="file-dot">·</span>控制理论入门</a></li>
             <li><a href="#"><span class="file-dot">·</span>文章标题三.md</a></li>
           </ul>
         </div>
@@ -821,7 +821,7 @@
     return html;
   }
 
-  function openDoc(mdPath, title) {
+  function openDoc(mdPath, title, folder) {
     // Check if already open
     var existing = document.querySelector('[data-md-panel="' + mdPath.replace(/"/g,'') + '"]');
     if (existing) {
@@ -832,6 +832,8 @@
     var panelId = 'panel-' + id;
     if (!window.panelFiles) window.panelFiles = {};
     panelFiles[panelId] = mdPath.replace(/^source\//, '');
+    // Use folder for display path
+    if (folder) { panelFiles[panelId] = folder + '/' + title + '.md'; }
 
     // Create tab
     var tab = document.createElement('button');
