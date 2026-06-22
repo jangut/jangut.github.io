@@ -876,6 +876,9 @@ document.getElementById('btn-retry').addEventListener('click',()=>startGame(curr
 document.getElementById('btn-back').addEventListener('click',()=>showScreen('screen-select'));
 
 syncSliderLabels();
+// 隐藏加载遮罩
+document.getElementById('load-overlay').classList.add('hidden');
+
 buildSongList();
 if(window._errs.length){
   var e=document.createElement("div");
