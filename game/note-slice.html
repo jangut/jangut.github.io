@@ -112,8 +112,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 #hud-score{font-size:1.55rem;font-weight:900;}
 #game-canvas-wrap{position:absolute;inset:0;}
 canvas{width:100%;height:100%;display:block;}
-.hit-text{position:absolute;font-size:.95rem;font-weight:700;pointer-events:none;
-  animation:floatUp .65s ease-out forwards;z-index:25;text-shadow:0 0 8px currentColor;}
+.hit-particle{position:fixed;pointer-events:none;border-radius:50%;z-index:26;
+  width:5px;height:5px;
+  transition:transform .55s ease-out, opacity .55s ease-out;}
+.hit-text{position:absolute;font-size:1.1rem;font-weight:900;pointer-events:none;
+  animation:floatUp .65s ease-out forwards;z-index:25;
+  text-shadow:0 0 12px currentColor,0 0 30px currentColor;}
 @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1);}
   100%{opacity:0;transform:translate(-50%,-110%) scale(1.25);}}
 #btn-esc{position:absolute;top:10px;right:14px;z-index:30;
