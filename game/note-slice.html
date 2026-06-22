@@ -103,6 +103,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .btn-play:hover{opacity:.9;transform:translateY(-1px);}
 
 /* ══ GAME ══ */
+#screen-game::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 80%,rgba(192,132,252,0.08) 0%,transparent 60%);
+  animation:bgPulse 4s ease-in-out infinite alternate;pointer-events:none;z-index:0;}
 #screen-game{background:#07070f;}
 #game-hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;
   justify-content:space-between;padding:10px 16px;z-index:20;pointer-events:none;}
