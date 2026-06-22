@@ -312,6 +312,11 @@ let SONGS = {};
 const LOADER_MSG = document.getElementById('load-msg');
 
 async function initApp() {
+  // 后备超时：5秒后如果遮罩还在，强制隐藏
+  var safetyTimer = setTimeout(function(){
+    var el=document.getElementById('load-overlay');
+    if(el)el.classList.add('hidden');
+  },5000);
   try {
     const r = await fetch('../source/music.json');
     const data = await r.json();
@@ -331,8 +336,9 @@ async function initApp() {
   } catch (e) {
     console.warn('Failed to load music data:', e);
   }
-  buildSongList();
   document.getElementById('load-overlay').classList.add('hidden');
+  clearTimeout(safetyTimer);
+  buildSongList();
   // Show any errors
   if (window._errs.length) {
     var e = document.createElement("div");
@@ -776,7 +782,7 @@ function buildSongList(){
         "</div>"+
         "<div class=\"card-meta\">"+
           "<span>"+song.bpm+" BPM</span>"+
-          "<span>"+song.notes.length+" 音符</span>"+
+          "<span>"+(song.notes?song.notes.length:"?")+" 音符</span>"+
         "</div>"+
         "<div class=\"song-preview\">"+
           bars.map(function(h){return "<div class=\"preview-bar\" style=\"height:"+h+"px;background:"+song.color+"\"></div>";}).join("")+
