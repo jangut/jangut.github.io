@@ -590,7 +590,7 @@
 
   <div class="titlebar">
     <div class="dots"><span></span><span></span><span></span></div>
-    <div class="path" id="current-path">~<span class="sep">/</span>blog<span class="sep">/</span><span id="path-display" style="color:var(--text-primary)">index.md</span></div>
+    <div class="path" id="current-path">~<span class="sep">/</span>blog<span class="sep">/</span><span id="path-display" style="color:var(--text-primary)">index</span></div>
     <button class="menu-toggle" id="menuToggle" aria-label="打开文件导航">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
@@ -615,22 +615,22 @@
           <ul class="files">
             <li><a href="#" data-md="source/document/数学模型.md" data-folder="控制理论" data-file="数学模型"><span class="file-dot">·</span>数学模型</a></li>
             <li><a href="#" data-md="source/document/theory.md" data-folder="控制理论" data-file="控制理论入门"><span class="file-dot">·</span>控制理论入门</a></li>
-            <li><a href="#"><span class="file-dot">·</span>文章标题三.md</a></li>
+            <li><a href="#"><span class="file-dot">·</span>文章标题三</a></li>
           </ul>
         </div>
 
         <div class="folder">
           <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 分类二</button>
           <ul class="files">
-            <li><a href="#"><span class="file-dot">·</span>文章标题四.md</a></li>
-            <li><a href="#"><span class="file-dot">·</span>文章标题五.md</a></li>
+            <li><a href="#"><span class="file-dot">·</span>文章标题四</a></li>
+            <li><a href="#"><span class="file-dot">·</span>文章标题五</a></li>
           </ul>
         </div>
 
         <div class="folder">
           <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 分类三</button>
           <ul class="files">
-            <li><a href="#"><span class="file-dot">·</span>文章标题六.md</a></li>
+            <li><a href="#"><span class="file-dot">·</span>文章标题六</a></li>
           </ul>
         </div>
 
@@ -731,7 +731,7 @@
         pathEl.textContent = 'index';
       } else {
         var pf = panelFiles[panelId];
-        pathEl.textContent = pf ? pf : (panelId.replace('panel-', '') + '.md');
+        pathEl.textContent = pf ? pf : (panelId.replace('panel-', ''));
       }
     }
   };
@@ -833,7 +833,7 @@
     if (!window.panelFiles) window.panelFiles = {};
     panelFiles[panelId] = mdPath.replace(/^source\//, '');
     // Use folder for display path
-    if (folder) { panelFiles[panelId] = folder + '/' + title + '.md'; }
+    if (folder) { panelFiles[panelId] = folder + '/' + title; }
 
     // Create tab
     var tab = document.createElement('button');
