@@ -64,6 +64,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 .preview-bar{flex:1;border-radius:2px 2px 0 0;background:var(--cc,var(--accent));opacity:.5;
   transition:opacity .18s;}
 .song-card:hover .preview-bar,.song-card.selected .preview-bar{opacity:.9;}
+.cat-header{font-size:.72rem;font-weight:700;color:var(--muted);
+  letter-spacing:.12em;padding:14px 14px 4px;text-transform:uppercase;}
 
 /* ── SETTINGS PANEL ── */
 .settings-section{background:var(--surface);border:1px solid var(--border);
@@ -308,7 +310,7 @@ window.addEventListener("unhandledrejection",function(e){window._errs.push("Prom
 // ════════════════════════════════════════════════
 const SONGS = {
   twinkle:{
-    name:'小星星',bpm:108,diff:'入门',color:'#c084fc',
+    name:'小星星',cat:'入门',bpm:108,diff:'入门',color:'#c084fc',
     notes:[
       ['C4',1],['C4',1],['G4',1],['G4',1],['A4',1],['A4',1],['G4',2],
       ['F4',1],['F4',1],['E4',1],['E4',1],['D4',1],['D4',1],['C4',2],
@@ -319,7 +321,7 @@ const SONGS = {
     ]
   },
   ode:{
-    name:'欢乐颂',bpm:100,diff:'普通',color:'#38bdf8',
+    name:'欢乐颂',cat:'经典',bpm:100,diff:'普通',color:'#38bdf8',
     notes:[
       ['E4',1],['E4',1],['F4',1],['G4',1],['G4',1],['F4',1],['E4',1],['D4',1],
       ['C4',1],['C4',1],['D4',1],['E4',1],['E4',1.5],['D4',.5],['D4',2],
@@ -356,7 +358,7 @@ const SONGS = {
   },
   // ── 少女的祈祷 完整主题 ──
   maiden:{
-    name:'少女的祈祷',bpm:120,diff:'地狱',color:'#f97316',
+    name:'少女的祈祷',cat:'经典',bpm:120,diff:'地狱',color:'#f97316',
     notes:[
       // ── Intro ──
       ['E5',.5],['D5',.5],['C5',.5],['B4',.5],
@@ -411,7 +413,7 @@ const SONGS = {
   },
   // ── 茉莉花 ──
   moli:{
-    name:'茉莉花',bpm:120,diff:'普通',color:'#84cc16',
+    name:'茉莉花',cat:'国风',bpm:120,diff:'普通',color:'#84cc16',
     notes:[
       ['D4',.5],['D4',.5],['E4',.5],['G4',.5],['E4',.5],['D4',1],
       ['D4',.5],['D4',.5],['E4',.5],['G4',.5],['E4',.5],['D4',1],
@@ -425,7 +427,7 @@ const SONGS = {
   },
   // ── 梦中的婚礼 ──
   dream:{
-    name:'梦中的婚礼',bpm:95,diff:'普通',color:'#f472b6',
+    name:'梦中的婚礼',cat:'流行',bpm:95,diff:'普通',color:'#f472b6',
     notes:[
       ['C4',.5],['E4',.5],['G4',.5],['C5',1],['B4',.5],['G4',.5],['E4',.5],['C4',1],
       ['D4',.5],['F4',.5],['A4',.5],['C5',1],['B4',.5],['A4',.5],['F4',.5],['D4',1],
@@ -840,37 +842,49 @@ document.querySelectorAll('.sel-tab').forEach(tab=>{
 // ════════════════════════════════════════════════
 let selectedSong='twinkle';
 function buildSongList(){
-  const list=document.getElementById('tab-songs');
-  list.innerHTML='';
+  const list=document.getElementById("tab-songs");
+  list.innerHTML="";
+  const order=["入门","国风","流行","摇滚","经典"];
+  const groups={};
   for(const [key,song] of Object.entries(SONGS)){
-    const bars=song.notes.slice(0,24).map(([n])=>{
-      const t=(noteToSemi(n)-SEMI_MIN)/(SEMI_MAX-SEMI_MIN);
-      return Math.round(3+t*23);
-    });
-    const card=document.createElement('div');
-    card.className='song-card'+(key===selectedSong?' selected':'');
-    card.style.setProperty('--cc',song.color);
-    card.innerHTML=`
-      <div class="card-row">
-        <span class="card-title">${song.name}</span>
-        <span class="card-badge">${song.diff}</span>
-      </div>
-      <div class="card-meta">
-        <span>${song.bpm} BPM</span>
-        <span>${song.notes.length} 音符</span>
-        <span style="color:${song.color}">${key==='maiden'?'★★★★★':''}</span>
-      </div>
-      <div class="song-preview">
-        ${bars.map(h=>`<div class="preview-bar" style="height:${h}px;background:${song.color}"></div>`).join('')}
-      </div>
-    `;
-    card.addEventListener('click',()=>{
-      selectedSong=key;
-      document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('selected'));
-      card.classList.add('selected');
-    });
-    list.appendChild(card);
+    const cat=song.cat||"其他";
+    if(!groups[cat])groups[cat]=[];
+    groups[cat].push(key);
   }
+  order.forEach(cat=>{
+    if(!groups[cat]||!groups[cat].length)return;
+    const hdr=document.createElement("div");
+    hdr.className="cat-header";hdr.textContent=cat;
+    list.appendChild(hdr);
+    groups[cat].forEach(key=>{
+      const song=SONGS[key];
+      const bars=song.notes.slice(0,24).map(([n])=>{
+        const t=(noteToSemi(n)-SEMI_MIN)/(SEMI_MAX-SEMI_MIN);
+        return Math.round(3+t*23);
+      });
+      const card=document.createElement("div");
+      card.className="song-card"+(key===selectedSong?" selected":"");
+      card.style.setProperty("--cc",song.color);
+      card.innerHTML=
+        "<div class=\"card-row\">"+
+          "<span class=\"card-title\">"+song.name+"</span>"+
+          "<span class=\"card-badge\">"+song.diff+"</span>"+
+        "</div>"+
+        "<div class=\"card-meta\">"+
+          "<span>"+song.bpm+" BPM</span>"+
+          "<span>"+song.notes.length+" 音符</span>"+
+        "</div>"+
+        "<div class=\"song-preview\">"+
+          bars.map(function(h){return "<div class=\"preview-bar\" style=\"height:"+h+"px;background:"+song.color+"\"></div>";}).join("")+
+        "</div>";
+      card.addEventListener("click",()=>{
+        selectedSong=key;
+        document.querySelectorAll(".song-card").forEach(c=>c.classList.remove("selected"));
+        card.classList.add("selected");
+      });
+      list.appendChild(card);
+    });
+  });
 }
 
 document.getElementById('btn-play').addEventListener('click',()=>{ audioCtx.resume(); startGame(selectedSong); });
