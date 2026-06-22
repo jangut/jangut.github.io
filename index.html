@@ -651,20 +651,88 @@
               <div class="row"><span class="prompt">$</span><span class="cmd">who am I?</span></div>
               <div class="row out">我系一名自动化专业的研究生</div>
               <div class="row out">给个关注吧，求求了 <a href="https://github.com/jangut" target="_blank" rel="noopener">github</a></div>
+              <div class="row out">也可以通过邮箱联系我：<a href="mailto:2159239823@qq.com" target="_blank" rel="noopener">2159239823@qq.com</a></div>
               <div class="row" style="margin-top:10px"><span class="prompt">$</span><span class="cmd">更新内容</span></div>
               <div class="row out">更新一些控制理论方面知识和日常感悟</div>
               <div class="row out" style="padding-left:18px">更新频率不固定，看个人情况</div>
-              <div class="row out" style="padding-left:18px">但一定值得您的期待<span class="cursor"></span></div>
+              <div class="row out" style="padding-left:18px">但一定值得您的期待🤝<span class="cursor"></span></div>
             </div>
             <h1>欢迎来到<span class="dim">这个博客</span></h1>
             <p class="lede">左侧是我个人写的文章，点开文件夹就能找到对应内容。希望可以帮助到你</p>
-
+            <p class="lede">如果不喜欢也别急着走，左侧最下边有几个我的自制小游戏可以玩</p>
+            <p class="lede">国内网络访问慢，见谅</p>
             <div class="tag-row">
               <span class="pill">#控制理论</span>
             </div>
           </div>
 
+          <div class="feed">
+            <div class="section-head">
+              <h2><span class="num">06</span> · 最近提交</h2>
+              <span class="sub">git log --oneline -6</span>
+            </div>
 
+            <article class="post">
+              <div class="post-num">06</div>
+              <div class="post-body">
+                <div class="post-meta"><span class="folder-tag">分类一</span><span>2026-06-15</span></div>
+                <h3>文章标题一：替换成你自己的标题</h3>
+                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
+                <div class="tags"><span>标签</span><span>标签</span></div>
+              </div>
+            </article>
+
+            <article class="post">
+              <div class="post-num">05</div>
+              <div class="post-body">
+                <div class="post-meta"><span class="folder-tag">分类一</span><span>2026-06-10</span></div>
+                <h3>文章标题二：替换成你自己的标题</h3>
+                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
+                <div class="tags"><span>标签</span><span>标签</span></div>
+              </div>
+            </article>
+
+            <article class="post">
+              <div class="post-num">04</div>
+              <div class="post-body">
+                <div class="post-meta"><span class="folder-tag">分类二</span><span>2026-06-08</span></div>
+                <h3>文章标题三：替换成你自己的标题</h3>
+                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
+                <div class="tags"><span>标签</span><span>标签</span></div>
+              </div>
+            </article>
+
+            <article class="post">
+              <div class="post-num">03</div>
+              <div class="post-body">
+                <div class="post-meta"><span class="folder-tag">分类二</span><span>2026-06-05</span></div>
+                <h3>文章标题四：替换成你自己的标题</h3>
+                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
+                <div class="tags"><span>标签</span><span>标签</span></div>
+              </div>
+            </article>
+
+            <article class="post">
+              <div class="post-num">02</div>
+              <div class="post-body">
+                <div class="post-meta"><span class="folder-tag">分类三</span><span>2026-06-02</span></div>
+                <h3>文章标题五：替换成你自己的标题</h3>
+                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
+                <div class="tags"><span>标签</span><span>标签</span></div>
+              </div>
+            </article>
+
+            <article class="post">
+              <div class="post-num">01</div>
+              <div class="post-body">
+                <div class="post-meta"><span class="folder-tag">杂谈</span><span>2026-05-28</span></div>
+                <h3>文章标题六：替换成你自己的标题</h3>
+                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
+                <div class="tags"><span>标签</span><span>标签</span></div>
+              </div>
+            </article>
+          </div>
+        </section>
 
         <!-- about 面板 -->
 
@@ -722,7 +790,7 @@
 
   // --- Markdown viewer: dynamic closable tabs ---
   var dynamicId = 0;
-  var tabbar = document.querySelector('.editor-tabs');
+  var tabbar = document.querySelector('.tabbar');
   var bodyInner = document.querySelector('.editor-body-inner');
 
   function simpleMarkdown(text) {
@@ -796,14 +864,13 @@
     switchToPanel(panelId);
 
     // Load content
-    var url = encodeURI(mdPath);
-    fetch(url)
+    fetch(mdPath)
       .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.text(); })
       .then(function(text) {
         panel.innerHTML = '<div class="article-body" style="max-width:780px;margin:0 auto;padding:24px;">' + simpleMarkdown(text) + '</div>';
       })
       .catch(function() {
-        panel.innerHTML = '<div style="padding:48px;text-align:center;color:var(--accent3);">\u26a0 \u6587\u7ae0\u52a0\u8f7d失败\uff0c\u8bf7检查文件路径</div>';
+        panel.innerHTML = '<div style="padding:48px;text-align:center;color:var(--accent3);">\u26a0 \u6587\u7ae0\u6682\u672a\u53d1\u5e03\uff0c\u656c\u8bf7\u671f\u5f85</div>';
       });
   }
 
@@ -832,10 +899,7 @@
   document.querySelectorAll('[data-md]').forEach(function(a) {
     a.addEventListener('click', function(e) {
       e.preventDefault();
-      e.stopPropagation();
-      var path = this.dataset.md;
-      var title = this.textContent.trim();
-      openDoc(path, title);
+      openDoc(this.dataset.md, this.textContent.trim());
     });
   });
 </script>
