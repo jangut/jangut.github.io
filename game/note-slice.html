@@ -311,14 +311,18 @@ window.addEventListener("unhandledrejection",function(e){window._errs.push("Prom
 // ════════════════════════════════════════════════
 const SONGS = {};
 // 从 music.txt 加载歌曲
+// 安全超时：5秒后强制隐藏加载遮罩
+setTimeout(function(){
+  var el=document.getElementById('load-overlay');
+  if(el&&!el.classList.contains('hidden'))el.classList.add('hidden');
+},5000);
+
 async function loadSongs(){
   try {
-    const res = await fetch('../source/music.txt');
+    const res = await fetch('../source/index.json');
     const data = await res.json();
     Object.assign(SONGS, data);
-  } catch(e) {
-    console.warn('music.txt not found, using default songs');
-  }
+  } catch(e) {}
   document.getElementById('load-overlay').classList.add('hidden');
   buildSongList();
 },
@@ -1001,7 +1005,16 @@ function buildSongList(){
   });
 }
 
-document.getElementById('btn-play').addEventListener('click',()=>{ audioCtx.resume(); startGame(selectedSong); });
+document.getElementById('btn-play').addEventListener('click',async()=>{
+    audioCtx.resume();
+    if(!SONGS[selectedSong]||!SONGS[selectedSong].notes) try {
+      const r=await fetch('../source/songs/'+selectedSong+'.json');
+      const d=await r.json();
+      if(!SONGS[selectedSong]) SONGS[selectedSong]={};
+      SONGS[selectedSong].notes=d.notes;
+    } catch(e){}
+    startGame(selectedSong);
+  });
 document.getElementById('btn-esc').addEventListener('click',()=>{ running=false;clearSong();stopHarmony();notes=[];showScreen('screen-select'); });
 document.getElementById('btn-retry').addEventListener('click',()=>startGame(currentSongKey));
 document.getElementById('btn-back').addEventListener('click',()=>showScreen('screen-select'));
