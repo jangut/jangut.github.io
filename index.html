@@ -895,7 +895,7 @@
   document.querySelectorAll('[data-md]').forEach(function(a) {
     a.addEventListener('click', function(e) {
       e.preventDefault();
-      openDoc(this.dataset.md, this.textContent.trim());
+      openDoc(this.dataset.md, this.dataset.file || this.textContent.trim().replace(/^·/, ''), this.dataset.folder || '');
     });
   });
 </script>
