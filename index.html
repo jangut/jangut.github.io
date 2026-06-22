@@ -664,73 +664,7 @@
             </div>
           </div>
 
-          <div class="feed">
-            <div class="section-head">
-              <h2><span class="num">06</span> · 最近提交</h2>
-              <span class="sub">git log --oneline -6</span>
-            </div>
 
-            <article class="post">
-              <div class="post-num">06</div>
-              <div class="post-body">
-                <div class="post-meta"><span class="folder-tag">分类一</span><span>2026-06-15</span></div>
-                <h3>文章标题一：替换成你自己的标题</h3>
-                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
-                <div class="tags"><span>标签</span><span>标签</span></div>
-              </div>
-            </article>
-
-            <article class="post">
-              <div class="post-num">05</div>
-              <div class="post-body">
-                <div class="post-meta"><span class="folder-tag">分类一</span><span>2026-06-10</span></div>
-                <h3>文章标题二：替换成你自己的标题</h3>
-                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
-                <div class="tags"><span>标签</span><span>标签</span></div>
-              </div>
-            </article>
-
-            <article class="post">
-              <div class="post-num">04</div>
-              <div class="post-body">
-                <div class="post-meta"><span class="folder-tag">分类二</span><span>2026-06-08</span></div>
-                <h3>文章标题三：替换成你自己的标题</h3>
-                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
-                <div class="tags"><span>标签</span><span>标签</span></div>
-              </div>
-            </article>
-
-            <article class="post">
-              <div class="post-num">03</div>
-              <div class="post-body">
-                <div class="post-meta"><span class="folder-tag">分类二</span><span>2026-06-05</span></div>
-                <h3>文章标题四：替换成你自己的标题</h3>
-                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
-                <div class="tags"><span>标签</span><span>标签</span></div>
-              </div>
-            </article>
-
-            <article class="post">
-              <div class="post-num">02</div>
-              <div class="post-body">
-                <div class="post-meta"><span class="folder-tag">分类三</span><span>2026-06-02</span></div>
-                <h3>文章标题五：替换成你自己的标题</h3>
-                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
-                <div class="tags"><span>标签</span><span>标签</span></div>
-              </div>
-            </article>
-
-            <article class="post">
-              <div class="post-num">01</div>
-              <div class="post-body">
-                <div class="post-meta"><span class="folder-tag">杂谈</span><span>2026-05-28</span></div>
-                <h3>文章标题六：替换成你自己的标题</h3>
-                <p>这里放一段简短的摘要，介绍这篇文章大概讲了什么，控制在一两句话以内。</p>
-                <div class="tags"><span>标签</span><span>标签</span></div>
-              </div>
-            </article>
-          </div>
-        </section>
 
         <!-- about 面板 -->
 
@@ -862,13 +796,14 @@
     switchToPanel(panelId);
 
     // Load content
-    fetch(mdPath)
+    var url = encodeURI(mdPath);
+    fetch(url)
       .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.text(); })
       .then(function(text) {
         panel.innerHTML = '<div class="article-body" style="max-width:780px;margin:0 auto;padding:24px;">' + simpleMarkdown(text) + '</div>';
       })
       .catch(function() {
-        panel.innerHTML = '<div style="padding:48px;text-align:center;color:var(--accent3);">\u26a0 \u6587\u7ae0\u6682\u672a\u53d1\u5e03\uff0c\u656c\u8bf7\u671f\u5f85</div>';
+        panel.innerHTML = '<div style="padding:48px;text-align:center;color:var(--accent3);">\u26a0 \u6587\u7ae0\u52a0\u8f7d失败\uff0c\u8bf7检查文件路径</div>';
       });
   }
 
@@ -897,7 +832,10 @@
   document.querySelectorAll('[data-md]').forEach(function(a) {
     a.addEventListener('click', function(e) {
       e.preventDefault();
-      openDoc(this.dataset.md, this.textContent.trim());
+      e.stopPropagation();
+      var path = this.dataset.md;
+      var title = this.textContent.trim();
+      openDoc(path, title);
     });
   });
 </script>
