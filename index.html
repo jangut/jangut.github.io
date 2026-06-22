@@ -831,7 +831,7 @@
     var id = 'doc-' + (dynamicId++);
     var panelId = 'panel-' + id;
     if (!window.panelFiles) window.panelFiles = {};
-    panelFiles[panelId] = mdPath.split('/').pop();
+    panelFiles[panelId] = mdPath.replace(/^source\//, '');
 
     // Create tab
     var tab = document.createElement('button');
