@@ -116,6 +116,26 @@
     cursor: pointer;
   }
   .menu-toggle svg{ width: 16px; height: 16px; }
+  .sidebar-peek{
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px; height: 44px;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted);
+    cursor: pointer;
+    z-index: 25;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .sidebar-peek:hover{ opacity: .8; }
+  .sidebar-peek svg{ width: 14px; height: 14px; }
 
   /* ============ LAYOUT ============ */
   .app{
@@ -262,19 +282,26 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 11px 18px;
+    padding: 9px 18px;
     color: var(--text-muted);
-    border-right: 1px solid var(--line);
     cursor: pointer;
     background: none;
-    border-top: 2px solid transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 13px;
+    border-radius: 8px 8px 0 0;
+    margin: 4px 0 0 4px;
+    transition: background .15s, color .15s;
     white-space: nowrap;
   }
   .tab .file-dot{ font-size: 10px; }
   .tab.active{
     color: var(--text-primary);
     background: var(--bg-void);
-    border-top: 2px solid var(--accent-cyan);
+    border: 1px solid var(--line);
+    border-bottom: 1px solid var(--bg-void);
+    position: relative;
+    z-index: 1;
   }
   .tab:not(.active):hover{ color: var(--text-secondary); }
 
@@ -330,15 +357,6 @@
   .terminal .cmd{ color: var(--text-primary); }
   .terminal .out{ color: var(--text-secondary); padding-left: 18px; }
   .terminal .out .hl{ color: var(--accent-cyan); }
-  .cursor{
-    display: inline-block;
-    width: 8px; height: 16px;
-    background: var(--accent-cyan);
-    margin-left: 2px;
-    vertical-align: -3px;
-    animation: blink 1s steps(1) infinite;
-  }
-  @keyframes blink{ 50%{ opacity: 0; } }
   /* terminal 内链接 */
   .terminal .out a{ color:var(--accent-cyan); text-decoration:underline; text-underline-offset:2px; }
   .terminal .out a:hover{ color:var(--accent-green); }
@@ -534,6 +552,7 @@
   @media (max-width: 880px){
     .app{ grid-template-columns: 1fr; position: relative; }
     .menu-toggle{ display: flex; }
+    .sidebar-peek{ display: flex; }
     .sidebar{
       position: fixed;
       top: 44px; bottom: 28px; left: 0;
@@ -568,7 +587,7 @@
 
   <div class="titlebar">
     <div class="dots"><span></span><span></span><span></span></div>
-    <div class="path">~<span class="sep">/</span>blog<span class="sep">/</span><span style="color:var(--text-primary)">index.md</span></div>
+    <div class="path" id="current-path">~<span class="sep">/</span>blog<span class="sep">/</span><span id="path-display" style="color:var(--text-primary)">index.md</span></div>
     <button class="menu-toggle" id="menuToggle" aria-label="打开文件导航">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
@@ -633,6 +652,9 @@
         <button class="tab active" data-panel="panel-index"><span class="file-dot" style="color:var(--accent-cyan)">●</span>首页</button>
 
       </div>
+      <button class="sidebar-peek" id="sidebarPeek" aria-label="打开侧边栏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
 
       <div class="editor-body">
         <div class="editor-body-inner">
@@ -655,7 +677,7 @@
               <div class="row" style="margin-top:10px"><span class="prompt">$</span><span class="cmd">更新内容</span></div>
               <div class="row out">更新一些控制理论方面知识和日常感悟</div>
               <div class="row out" style="padding-left:18px">更新频率不固定，看个人情况</div>
-              <div class="row out" style="padding-left:18px">但一定值得您的期待🤝<span class="cursor"></span></div>
+              <div class="row out" style="padding-left:18px">但一定值得您的期待🤝</div>
             </div>
             <h1>欢迎来到<span class="dim">这个博客</span></h1>
             <p class="lede">左侧是我个人写的文章，点开文件夹就能找到对应内容。希望可以帮助到你</p>
@@ -673,13 +695,8 @@
       </div>
 
       <div class="statusbar">
-        <span class="branch">⎇ main*</span>
-        <span class="hide-sm">UTF-8</span>
-        <span class="hide-sm">Markdown</span>
-        <span class="hide-sm">Ln 42, Col 7</span>
         <span class="spacer"></span>
-        <span class="live"><span class="ping"></span> connected</span>
-      </div>
+        <span id="update-time">更新于 2026-06-22</span>
 
     </div>
   </div>
@@ -696,12 +713,28 @@
   // 标签页切换
   const tabs = document.querySelectorAll('.tab');
   const panels = document.querySelectorAll('.panel');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.panel).classList.add('active');
+  // Use switchToPanel for all tab clicks (handles static + dynamic)
+  var switchToPanel = function(panelId) {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+    var targetTab = document.querySelector('[data-panel="' + panelId + '"]');
+    var targetPanel = document.getElementById(panelId);
+    if (targetTab) targetTab.classList.add('active');
+    if (targetPanel) targetPanel.classList.add('active');
+    // Update path display
+    var pathEl = document.getElementById('path-display');
+    if (pathEl) {
+      if (panelId === 'panel-index') {
+        pathEl.textContent = 'index.md';
+      } else {
+        var pf = panelFiles[panelId];
+        pathEl.textContent = pf ? pf : (panelId.replace('panel-', '') + '.md');
+      }
+    }
+  };
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      switchToPanel(this.dataset.panel);
       document.querySelector('.editor-body').scrollTo({top: 0, behavior: 'smooth'});
     });
   });
@@ -720,6 +753,31 @@
   });
   scrim.addEventListener('click', closeSidebar);
   sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', closeSidebar));
+
+  // 左侧边缘按钮
+  var peekBtn = document.getElementById("sidebarPeek");
+  if (peekBtn) {
+    peekBtn.addEventListener("click", function() {
+      sidebar.classList.add("open");
+      scrim.classList.add("open");
+    });
+  }
+
+  // 左边缘右滑手势
+  var _sx = 0, _swiping = false;
+  document.addEventListener("touchstart", function(e) {
+    if (sidebar.classList.contains("open")) { _swiping = false; return; }
+    _sx = e.touches[0].clientX;
+    _swiping = _sx < 35;
+  }, {passive: true});
+  document.addEventListener("touchmove", function(e) {
+    if (!_swiping) return;
+    if (e.touches[0].clientX - _sx > 45) {
+      _swiping = false;
+      sidebar.classList.add("open");
+      scrim.classList.add("open");
+    }
+  }, {passive: true});
 
   // --- Markdown viewer: dynamic closable tabs ---
   var dynamicId = 0;
@@ -766,6 +824,8 @@
     }
     var id = 'doc-' + (dynamicId++);
     var panelId = 'panel-' + id;
+    if (!window.panelFiles) window.panelFiles = {};
+    panelFiles[panelId] = mdPath.split('/').pop();
 
     // Create tab
     var tab = document.createElement('button');
@@ -818,15 +878,7 @@
     }
   }
 
-  function switchToPanel(panelId) {
-    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-    document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
-    var targetTab = document.querySelector('[data-panel="' + panelId + '"]');
-    var targetPanel = document.getElementById(panelId);
-    if (targetTab) targetTab.classList.add('active');
-    if (targetPanel) { targetPanel.classList.add('active'); }
-    document.querySelector('.editor-body').scrollTo({top: 0, behavior: 'smooth'});
-  }
+
 
   // Sidebar md links
   document.querySelectorAll('[data-md]').forEach(function(a) {
