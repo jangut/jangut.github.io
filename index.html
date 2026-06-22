@@ -895,7 +895,11 @@
   document.querySelectorAll('[data-md]').forEach(function(a) {
     a.addEventListener('click', function(e) {
       e.preventDefault();
-      openDoc(this.dataset.md, this.dataset.file || this.textContent.trim().replace(/^·/, ''), this.dataset.folder || '');
+      var mdPath = this.dataset.md;
+      var mdTitle = this.dataset.file || this.textContent.trim().replace(/^\u00b7/, '');
+      var folderEl = this.closest('.folder');
+      var mdFolder = folderEl ? folderEl.querySelector('.folder-toggle').textContent.replace(/[▸📁]/g, '').trim() : '';
+      openDoc(mdPath, mdTitle, mdFolder);
     });
   });
 </script>
