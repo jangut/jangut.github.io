@@ -46,7 +46,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-seri
 /* ── SONG CARDS ── */
 .song-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
   padding:20px 22px 18px;  /* top/left/right/bottom — 调大这个让卡片更高 */
-  cursor:pointer;transition:border-color .18s,background .18s,transform .1s;
+  cursor:pointer;flex-shrink:0;transition:border-color .18s,background .18s,transform .1s;
   position:relative;overflow:hidden;}
 .song-card::before{content:'';position:absolute;inset:0;
   background:linear-gradient(120deg,transparent 60%,var(--cc,#c084fc) 200%);
