@@ -728,7 +728,7 @@
     var pathEl = document.getElementById('path-display');
     if (pathEl) {
       if (panelId === 'panel-index') {
-        pathEl.textContent = 'index.md';
+        pathEl.textContent = 'index';
       } else {
         var pf = panelFiles[panelId];
         pathEl.textContent = pf ? pf : (panelId.replace('panel-', '') + '.md');
