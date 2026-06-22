@@ -1,0 +1,12 @@
+﻿{
+  "appId": "io.github.jangut.cake2048",
+  "appName": "HW游戏盒子",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "hostname": "localhost"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

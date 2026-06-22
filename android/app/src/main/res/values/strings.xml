@@ -1,0 +1,8 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HW游戏盒子</string>
+    <string name="title_activity_main">HW游戏盒子</string>
+    <string name="package_name">io.github.jangut.cake2048</string>
+    <string name="custom_url_scheme">io.github.jangut.cake2048</string>
+</resources>
+

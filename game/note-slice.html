@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>切音符 · NoteSlice</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700;900&display=swap');
+:root{
+  --bg:#07070f;--surface:#0f0f1c;--border:#1a1a2e;
+  --accent:#c084fc;--accent2:#38bdf8;--accent3:#fb7185;
+  --text:#e2e8f0;--muted:#475569;
+  --good:#4ade80;--ok:#fbbf24;--miss:#f87171;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;
+  height:100vh;overflow:hidden;user-select:none;}
+
+/* ── screens ── */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ══ SELECT ══ */
+#screen-select{
+  background:radial-gradient(ellipse at 30% 20%,#1a0a2e 0%,#07070f 60%);
+}
+.sel-header{padding:28px 28px 0;}
+.sel-logo{font-size:1.7rem;font-weight:900;letter-spacing:.12em;color:var(--accent);
+  text-shadow:0 0 32px #c084fc88;}
+.sel-sub{font-size:.72rem;color:var(--muted);margin-top:3px;letter-spacing:.06em;}
+
+/* tab row */
+.sel-tabs{display:flex;gap:0;padding:16px 20px 0;border-bottom:1px solid var(--border);}
+.sel-tab{padding:8px 18px;font-size:.8rem;font-family:inherit;
+  background:transparent;color:var(--muted);border:none;cursor:pointer;
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.sel-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* tab panels */
+.sel-panel{display:none;flex-direction:column;gap:10px;
+  flex:1;min-height:0;
+  overflow-y:auto;padding:16px 16px 12px;
+  /* fill remaining space between tabs and footer */
+  flex:1;min-height:0;}
+.sel-panel.active{display:flex;}
+
+/* song cards */
+.song-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;cursor:pointer;transition:border-color .18s,background .18s,transform .1s;
+  position:relative;overflow:hidden;}
+.song-card::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 60%,var(--cc,#c084fc) 200%);
+  opacity:.06;transition:opacity .18s;}
+.song-card:hover{border-color:var(--cc,var(--accent));transform:translateY(-2px);}
+.song-card:hover::before{opacity:.13;}
+.song-card.selected{border-color:var(--cc,var(--accent));
+  background:color-mix(in srgb,var(--cc,var(--accent)) 9%,var(--surface));}
+.card-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.card-title{font-size:1.05rem;font-weight:700;}
+.card-badge{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--cc,var(--accent));color:#fff;opacity:.85;margin-left:auto;}
+.card-meta{font-size:.7rem;color:var(--muted);display:flex;gap:10px;}
+.song-preview{margin-top:9px;height:26px;display:flex;align-items:flex-end;gap:2px;}
+.preview-bar{flex:1;border-radius:2px 2px 0 0;background:var(--cc,var(--accent));opacity:.5;
+  transition:opacity .18s;}
+.song-card:hover .preview-bar,.song-card.selected .preview-bar{opacity:.9;}
+
+/* ── SETTINGS PANEL ── */
+.settings-section{background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;}
+.settings-section h3{font-size:.75rem;font-weight:700;color:var(--muted);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;}
+.setting-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.setting-row:last-child{margin-bottom:0;}
+.setting-label{font-size:.82rem;flex:1;color:var(--text);}
+.setting-val{font-size:.8rem;font-weight:700;color:var(--accent);min-width:38px;text-align:right;}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1.2;height:4px;
+  border-radius:2px;background:var(--border);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 6px #c084fc66;}
+.diff-btns{display:flex;gap:6px;}
+.diff-btn{flex:1;padding:7px 4px;font-size:.72rem;font-family:inherit;font-weight:700;
+  background:var(--border);color:var(--muted);border:1px solid transparent;
+  border-radius:7px;cursor:pointer;transition:all .15s;text-align:center;}
+.diff-btn.active{background:color-mix(in srgb,var(--accent) 18%,var(--surface));
+  color:var(--accent);border-color:var(--accent);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:22px;
+  cursor:pointer;transition:background .2s;}
+.toggle-slider::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;
+  background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle input:checked+.toggle-slider{background:var(--accent);}
+.toggle input:checked+.toggle-slider::after{transform:translateX(18px);}
+
+/* ── FOOTER ── */
+.sel-footer{padding:14px 16px 20px;border-top:1px solid var(--border);background:var(--surface);}
+.btn-play{width:100%;padding:13px;background:var(--accent);color:#fff;
+  font-size:.95rem;font-weight:700;font-family:inherit;border:none;border-radius:10px;
+  cursor:pointer;letter-spacing:.07em;transition:opacity .15s,transform .1s;
+  box-shadow:0 4px 22px #c084fc44;}
+.btn-play:hover{opacity:.9;transform:translateY(-1px);}
+
+/* ══ GAME ══ */
+#screen-game{background:#07070f;}
+#game-hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;
+  justify-content:space-between;padding:10px 16px;z-index:20;pointer-events:none;}
+#hud-left{display:flex;flex-direction:column;}
+#hud-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;color:var(--accent);opacity:.7;}
+#hud-combo{font-size:.95rem;font-weight:700;color:var(--accent2);min-height:1.3em;}
+#hud-score{font-size:1.55rem;font-weight:900;}
+#game-canvas-wrap{position:absolute;inset:0;}
+canvas{width:100%;height:100%;display:block;}
+.hit-text{position:absolute;font-size:.95rem;font-weight:700;pointer-events:none;
+  animation:floatUp .65s ease-out forwards;z-index:25;text-shadow:0 0 8px currentColor;}
+@keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  100%{opacity:0;transform:translate(-50%,-110%) scale(1.25);}}
+#btn-esc{position:absolute;top:10px;right:14px;z-index:30;
+  background:rgba(255,255,255,.07);color:var(--muted);border:1px solid var(--border);
+  border-radius:6px;padding:4px 10px;font-size:.7rem;font-family:inherit;cursor:pointer;
+  transition:color .15s;}
+#btn-esc:hover{color:var(--accent3);}
+#stat-bar{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;
+  gap:20px;padding:6px;font-size:.68rem;color:var(--muted);pointer-events:none;z-index:20;}
+/* diff badge in game */
+#hud-diff{font-size:.62rem;color:var(--muted);margin-top:1px;}
+
+/* ══ RESULT ══ */
+#screen-result{
+  background:radial-gradient(ellipse at 50% 35%,#150a2a 0%,#07070f 65%);
+  align-items:center;justify-content:center;gap:0;padding:28px 22px;}
+.r-songname{font-size:.72rem;color:var(--muted);letter-spacing:.1em;margin-bottom:6px;}
+.r-score{font-size:3.8rem;font-weight:900;line-height:1;text-shadow:0 0 48px #c084fc66;}
+.r-rank{font-size:1.3rem;font-weight:700;margin:10px 0 22px;}
+.r-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);border-radius:10px;overflow:hidden;
+  width:100%;max-width:300px;margin-bottom:22px;}
+.r-cell{background:var(--surface);padding:13px 8px;text-align:center;}
+.r-cell-v{font-size:1.35rem;font-weight:700;}
+.r-cell-l{font-size:.63rem;color:var(--muted);margin-top:2px;}
+.r-acc{font-size:.82rem;color:var(--muted);margin-bottom:24px;}
+.r-acc b{color:var(--accent2);}
+.r-diff-badge{font-size:.7rem;font-weight:700;padding:3px 12px;border-radius:20px;
+  margin-bottom:20px;display:inline-block;}
+.btn-r{padding:11px 0;border-radius:8px;font-size:.88rem;font-weight:700;font-family:inherit;
+  cursor:pointer;border:none;transition:opacity .15s;width:190px;margin-bottom:9px;}
+.btn-retry{background:var(--accent);color:#fff;}
+.btn-back{background:transparent;color:var(--muted);border:1px solid var(--border)!important;border:none;}
+.btn-r:hover{opacity:.8;}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.03);border-radius:3px;}
+::-webkit-scrollbar-thumb{background:#2d2d4a;border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+/* force scrollbar always visible on song/settings panels */
+.sel-panel{scrollbar-gutter:stable;}
+.sel-panel::-webkit-scrollbar{width:5px;display:block;}
+.sel-panel::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:3px;}
+.sel-panel::-webkit-scrollbar-thumb{background:#3a3a5c;border-radius:3px;}
+.sel-panel::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* ── LOADING STATE ── */
+#load-overlay{position:absolute;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;z-index:100;}
+#load-overlay.hidden{display:none;}
+.load-spinner{width:36px;height:36px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-msg{font-size:.82rem;color:var(--muted);}
+.load-err{font-size:.82rem;color:var(--miss);text-align:center;max-width:260px;line-height:1.5;}
+.load-err b{display:block;color:var(--text);font-size:.95rem;margin-bottom:6px;}
+.btn-demo{margin-top:4px;padding:8px 20px;background:var(--accent);color:#fff;
+  font-family:inherit;font-size:.8rem;font-weight:700;border:none;
+  border-radius:7px;cursor:pointer;transition:opacity .15s;}
+.btn-demo:hover{opacity:.85;}
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING ══ -->
+<div id="load-overlay">
+  <div class="load-spinner"></div>
+  <div class="load-msg" id="load-msg">正在读取 music.txt …</div>
+</div>
+
+<!-- ══ SELECT ══ -->
+<div id="screen-select" class="screen active">
+  <div class="sel-header">
+    <a href="index.html" style="display:inline-block;color:var(--muted);text-decoration:none;font-size:.75rem;margin-bottom:6px;">← 返回游戏盒</a>
+    <div class="sel-logo">✦ 切音符</div>
+    <div class="sel-sub">NoteSlice · 点击节拍最高点</div>
+  </div>
+  <div class="sel-tabs">
+    <button class="sel-tab active" data-tab="songs">选歌</button>
+    <button class="sel-tab" data-tab="settings">设置</button>
+  </div>
+  <div id="tab-songs" class="sel-panel active"></div>
+  <div id="tab-settings" class="sel-panel">
+
+    <!-- DIFFICULTY presets -->
+    <div class="settings-section">
+      <h3>难度预设</h3>
+      <div class="diff-btns" id="diff-presets">
+        <div class="diff-btn active" data-preset="easy">简单</div>
+        <div class="diff-btn" data-preset="normal">普通</div>
+        <div class="diff-btn" data-preset="hard">困难</div>
+        <div class="diff-btn" data-preset="hell">地狱</div>
+      </div>
+    </div>
+
+    <!-- SPEED & ANGLE -->
+    <div class="settings-section">
+      <h3>游戏参数</h3>
+      <div class="setting-row">
+        <span class="setting-label">速度倍率</span>
+        <input type="range" id="cfg-speed" min="0.5" max="2.5" step="0.1" value="1.0">
+        <span class="setting-val" id="cfg-speed-val">1.0×</span>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">角度刁钻</span>
+        <input type="range" id="cfg-angle" min="0" max="1" step="0.05" value="0.2">
+        <span class="setting-val" id="cfg-angle-val">20%</span>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">判定宽松度</span>
+        <input type="range" id="cfg-window" min="0.4" max="2.0" step="0.1" value="1.0">
+        <span class="setting-val" id="cfg-window-val">标准</span>
+      </div>
+    </div>
+
+    <!-- AUDIO -->
+    <div class="settings-section">
+      <h3>音频</h3>
+      <div class="setting-row">
+        <span class="setting-label">主音量</span>
+        <input type="range" id="cfg-vol" min="0" max="1" step="0.05" value="0.8">
+        <span class="setting-val" id="cfg-vol-val">80%</span>
+      </div>
+      <div class="setting-row toggle-row">
+        <span class="setting-label">击打音效</span>
+        <label class="toggle"><input type="checkbox" id="cfg-sfx" checked>
+          <span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row toggle-row">
+        <span class="setting-label">和声伴奏</span>
+        <label class="toggle"><input type="checkbox" id="cfg-harmony" checked>
+          <span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+  </div><!-- /tab-settings -->
+  <div class="sel-footer">
+    <button class="btn-play" id="btn-play">▶ &nbsp;开始游戏</button>
+  </div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="screen-game" class="screen">
+  <div id="game-hud">
+    <div id="hud-left">
+      <div id="hud-title">✦ 切音符</div>
+      <div id="hud-combo">—</div>
+      <div id="hud-diff"></div>
+    </div>
+    <div id="hud-score">0</div>
+  </div>
+  <button id="btn-esc">✕ 退出</button>
+  <div id="game-canvas-wrap"><canvas id="canvas"></canvas></div>
+  <div id="stat-bar">
+    <span>完美 <b id="s-perfect" style="color:var(--good)">0</b></span>
+    <span>良好 <b id="s-good" style="color:var(--ok)">0</b></span>
+    <span>错过 <b id="s-miss" style="color:var(--miss)">0</b></span>
+  </div>
+</div>
+
+<!-- ══ RESULT ══ -->
+<div id="screen-result" class="screen">
+  <div class="r-songname" id="r-songname"></div>
+  <div class="r-score" id="r-score"></div>
+  <div class="r-rank" id="r-rank"></div>
+  <div class="r-diff-badge" id="r-diff-badge"></div>
+  <div class="r-grid">
+    <div class="r-cell"><div class="r-cell-v" id="r-perfect" style="color:var(--good)">0</div><div class="r-cell-l">完美</div></div>
+    <div class="r-cell"><div class="r-cell-v" id="r-good"    style="color:var(--ok)">0</div><div class="r-cell-l">良好</div></div>
+    <div class="r-cell"><div class="r-cell-v" id="r-miss"    style="color:var(--miss)">0</div><div class="r-cell-l">错过</div></div>
+  </div>
+  <div class="r-acc">准确率 <b id="r-acc">0%</b> &nbsp;·&nbsp; 最高连击 <b id="r-combo" style="color:var(--accent)">0</b></div>
+  <button class="btn-r btn-retry" id="btn-retry">↺ &nbsp;再玩一次</button>
+  <button class="btn-r btn-back"  id="btn-back" >← &nbsp;选择曲目</button>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+//  SONGS
+// ════════════════════════════════════════════════
+const SONGS = {
+  twinkle:{
+    name:'小星星',bpm:108,diff:'入门',color:'#c084fc',
+    notes:[
+      ['C4',1],['C4',1],['G4',1],['G4',1],['A4',1],['A4',1],['G4',2],
+      ['F4',1],['F4',1],['E4',1],['E4',1],['D4',1],['D4',1],['C4',2],
+      ['G4',1],['G4',1],['F4',1],['F4',1],['E4',1],['E4',1],['D4',2],
+      ['G4',1],['G4',1],['F4',1],['F4',1],['E4',1],['E4',1],['D4',2],
+      ['C4',1],['C4',1],['G4',1],['G4',1],['A4',1],['A4',1],['G4',2],
+      ['F4',1],['F4',1],['E4',1],['E4',1],['D4',1],['D4',1],['C4',2],
+    ]
+  },
+  ode:{
+    name:'欢乐颂',bpm:100,diff:'普通',color:'#38bdf8',
+    notes:[
+      ['E4',1],['E4',1],['F4',1],['G4',1],['G4',1],['F4',1],['E4',1],['D4',1],
+      ['C4',1],['C4',1],['D4',1],['E4',1],['E4',1.5],['D4',.5],['D4',2],
+      ['E4',1],['E4',1],['F4',1],['G4',1],['G4',1],['F4',1],['E4',1],['D4',1],
+      ['C4',1],['C4',1],['D4',1],['E4',1],['D4',1.5],['C4',.5],['C4',2],
+    ]
+  },
+  jingle:{
+    name:'铃儿响叮当',bpm:128,diff:'较难',color:'#fb7185',
+    notes:[
+      ['E4',1],['E4',1],['E4',2],['E4',1],['E4',1],['E4',2],
+      ['E4',1],['G4',1],['C4',1],['D4',1],['E4',4],
+      ['F4',1],['F4',1],['F4',1],['F4',1],
+      ['F4',1],['E4',1],['E4',1],['E4',1],
+      ['E4',1],['D4',1],['D4',1],['E4',1],['D4',2],['G4',2],
+      ['E4',1],['E4',1],['E4',2],['E4',1],['E4',1],['E4',2],
+      ['E4',1],['G4',1],['C4',1],['D4',1],['E4',4],
+      ['F4',1],['F4',1],['F4',1],['F4',1],
+      ['G4',1],['G4',1],['F4',1],['D4',1],['C4',4],
+    ]
+  },
+  canon:{
+    name:'卡农主题',bpm:96,diff:'普通',color:'#4ade80',
+    notes:[
+      ['D4',2],['A3',2],['B3',2],['F#3',2],
+      ['G3',2],['D3',2],['G3',2],['A3',2],
+      ['D4',2],['A3',2],['B3',2],['F#3',2],
+      ['G3',2],['D4',2],['G4',2],['A4',2],
+      ['B4',2],['F#4',2],['G4',2],['D4',2],
+      ['G3',2],['A3',2],['B3',2],['A3',2],
+      ['G3',2],['D4',2],['E4',2],['F#4',2],
+      ['G4',4],['F#4',2],['E4',2],
+    ]
+  },
+  // ── 少女的祈祷 完整主题 ──
+  maiden:{
+    name:'少女的祈祷',bpm:120,diff:'地狱',color:'#f97316',
+    notes:[
+      // ── Intro ──
+      ['E5',.5],['D5',.5],['C5',.5],['B4',.5],
+      ['A4',.5],['B4',.5],['C5',.5],['D5',.5],
+      // ── Theme A ──
+      ['E5',1],['E5',.5],['F5',.5],['E5',.5],['D5',.5],
+      ['C5',1],['C5',.5],['D5',.5],['C5',.5],['B4',.5],
+      ['A4',.5],['B4',.5],['C5',.5],['D5',.5],['E5',.5],['F5',.5],
+      ['E5',1],['D5',.5],['C5',.5],['B4',.5],['A4',.5],
+      ['G4',2],
+      // ── Theme A repeat ──
+      ['E5',1],['E5',.5],['F5',.5],['E5',.5],['D5',.5],
+      ['C5',1],['C5',.5],['D5',.5],['C5',.5],['B4',.5],
+      ['A4',.5],['B4',.5],['C5',.5],['D5',.5],['E5',.5],['F5',.5],
+      ['G5',1],['F5',.5],['E5',.5],['D5',.5],['C5',.5],
+      ['B4',2],
+      // ── Theme B ──
+      ['G5',.5],['F5',.5],['E5',.5],['D5',.5],
+      ['C5',.5],['D5',.5],['E5',.5],['F5',.5],
+      ['G5',1],['F5',.5],['E5',.5],['D5',.5],['C5',.5],
+      ['B4',1],['A4',.5],['B4',.5],['C5',.5],['D5',.5],
+      ['E5',.5],['F5',.5],['G5',.5],['A5',.5],
+      ['B5',1],['A5',.5],['G5',.5],['F5',.5],['E5',.5],
+      ['D5',.5],['E5',.5],['F5',.5],['E5',.5],['D5',.5],['C5',.5],
+      ['B4',2],
+      // ── Cascade run ──
+      ['E5',.25],['F5',.25],['E5',.25],['D5',.25],
+      ['C5',.25],['D5',.25],['E5',.25],['F5',.25],
+      ['G5',.25],['F5',.25],['E5',.25],['D5',.25],
+      ['C5',.25],['B4',.25],['A4',.25],['G4',.25],
+      // ── Climax ──
+      ['A5',1],['G5',.5],['F5',.5],['E5',.5],['D5',.5],
+      ['C5',1],['B4',.5],['A4',.5],['G4',.5],['F4',.5],
+      ['E4',.5],['F4',.5],['G4',.5],['A4',.5],['B4',.5],['C5',.5],
+      ['D5',.5],['E5',.5],['F5',.5],['G5',.5],['A5',.5],['B5',.5],
+      ['C6',2],
+      // ── Outro runs ──
+      ['B5',.25],['A5',.25],['G5',.25],['F5',.25],
+      ['E5',.25],['D5',.25],['C5',.25],['B4',.25],
+      ['A4',.25],['B4',.25],['C5',.25],['D5',.25],
+      ['E5',.25],['F5',.25],['G5',.25],['A5',.25],
+      ['B5',.5],['A5',.5],['G5',.5],['F5',.5],
+      ['E5',.5],['D5',.5],['C5',.5],['B4',.5],
+      ['A4',1],['G4',.5],['A4',.5],['B4',.5],['C5',.5],
+      ['D5',1],['C5',.5],['B4',.5],['A4',.5],['G4',.5],
+      ['F4',.5],['G4',.5],['A4',.5],['B4',.5],['C5',.5],['D5',.5],
+      ['E5',2],['D5',.5],['C5',.5],
+      ['B4',.5],['C5',.5],['D5',.5],['E5',.5],['F5',.5],['G5',.5],
+      ['A5',1],['G5',.5],['F5',.5],['E5',.5],['D5',.5],
+      ['C5',3],
+    ]
+  },
+  // ── 茉莉花 ──
+  moli:{
+    name:'茉莉花',bpm:120,diff:'普通',color:'#84cc16',
+    notes:[
+      ['D4',.5],['D4',.5],['E4',.5],['G4',.5],['E4',.5],['D4',1],
+      ['D4',.5],['D4',.5],['E4',.5],['G4',.5],['E4',.5],['D4',1],
+      ['E4',.5],['G4',.5],['E4',.5],['C4',.5],['B3',.5],['C4',.5],['E4',1],
+      ['D4',2],
+      ['B3',.5],['C4',.5],['E4',.5],['E4',.5],['G4',.5],['B4',.5],
+      ['B3',.5],['C4',.5],['E4',.5],['E4',.5],['G4',.5],['B4',.5],
+      ['E4',.5],['G4',.5],['B4',.5],['G4',.5],['E4',.5],['C4',.5],['B3',1],
+      ['D4',2],
+    ]
+  },
+  // ── 梦中的婚礼 ──
+  dream:{
+    name:'梦中的婚礼',bpm:95,diff:'普通',color:'#f472b6',
+    notes:[
+      ['C4',.5],['E4',.5],['G4',.5],['C5',1],['B4',.5],['G4',.5],['E4',.5],['C4',1],
+      ['D4',.5],['F4',.5],['A4',.5],['C5',1],['B4',.5],['A4',.5],['F4',.5],['D4',1],
+      ['E4',.5],['G4',.5],['C5',.5],['E5',1],['D5',.5],['C5',.5],['G4',.5],['E4',1],
+      ['F4',.5],['A4',.5],['C5',.5],['F5',2],
+      ['E5',1],['C5',1],['A4',1],['F4',1],
+      ['D4',.5],['F4',.5],['A4',.5],['C5',.5],['B4',.5],['A4',.5],['F4',.5],['D4',.5],
+      ['C4',4],
+    ]
+  }
+};
+
+// ════════════════════════════════════════════════
+//  DIFFICULTY PRESETS
+// ════════════════════════════════════════════════
+const PRESETS = {
+  easy:   {speed:0.7, angle:0.08, window:1.6, label:'简单',   color:'#4ade80'},
+  normal: {speed:1.0, angle:0.22, window:1.0, label:'普通',   color:'#38bdf8'},
+  hard:   {speed:1.4, angle:0.55, window:0.7, label:'困难',   color:'#fbbf24'},
+  hell:   {speed:1.9, angle:1.0,  window:0.5, label:'地狱',   color:'#fb7185'},
+};
+
+// live config
+const CFG = { speed:1.0, angle:0.22, window:1.0, vol:0.8, sfx:true, harmony:true };
+
+// ════════════════════════════════════════════════
+//  PITCH UTILS
+// ════════════════════════════════════════════════
+const NOTE_FREQ = {
+  'C3':130.81,'D3':146.83,'E3':164.81,'F3':174.61,'F#3':185,'G3':196,'A3':220,'B3':246.94,
+  'C4':261.63,'D4':293.66,'E4':329.63,'F4':349.23,'F#4':370,'G4':392,'A4':440,'B4':493.88,
+  'C5':523.25,'D5':587.33,'E5':659.25,'F5':698.46,'G5':783.99,'A5':880,'B5':987.77,
+  'C6':1046.5,'D6':1174.66,
+};
+function noteToSemi(n){
+  const m=n.match(/^([A-G]#?)(\d)$/); if(!m)return 24;
+  const map={C:0,'C#':1,D:2,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,A:9,'A#':10,B:11};
+  return map[m[1]]+(parseInt(m[2])-3)*12;
+}
+const ALL_SEMI=Object.keys(NOTE_FREQ).map(noteToSemi);
+const SEMI_MIN=Math.min(...ALL_SEMI), SEMI_MAX=Math.max(...ALL_SEMI);
+function notePeakFrac(n){
+  const t=(noteToSemi(n)-SEMI_MIN)/(SEMI_MAX-SEMI_MIN);
+  return 0.58 - t*0.50;
+}
+function lerpColor(a,b,t){
+  const ah=parseInt(a.slice(1),16),bh=parseInt(b.slice(1),16);
+  const ar=(ah>>16)&255,ag=(ah>>8)&255,ab=ah&255;
+  const br=(bh>>16)&255,bg=(bh>>8)&255,bb=bh&255;
+  return '#'+[ar+(br-ar)*t,ag+(bg-ag)*t,ab+(bb-ab)*t]
+    .map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+}
+
+// ════════════════════════════════════════════════
+//  AUDIO
+// ════════════════════════════════════════════════
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+const masterGain=audioCtx.createGain();
+masterGain.connect(audioCtx.destination);
+
+function playNote(name,dur=0.5,gain=0.4){
+  if(!CFG.sfx && gain>0.1) return;
+  const freq=NOTE_FREQ[name]; if(!freq)return;
+  const g=gain*CFG.vol;
+  const t=audioCtx.currentTime;
+  const osc=audioCtx.createOscillator();
+  const osc2=audioCtx.createOscillator();
+  const amp=audioCtx.createGain();
+  const amp2=audioCtx.createGain();
+  const filt=audioCtx.createBiquadFilter();
+  osc.type='triangle'; osc.frequency.value=freq;
+  osc2.type='sine';    osc2.frequency.value=freq*2; osc2.detune.value=4;
+  filt.type='lowpass'; filt.frequency.value=2800;
+  amp.gain.setValueAtTime(g,t);
+  amp.gain.exponentialRampToValueAtTime(0.001,t+dur);
+  amp2.gain.setValueAtTime(g*.25,t);
+  amp2.gain.exponentialRampToValueAtTime(0.001,t+dur*.7);
+  osc.connect(filt).connect(amp).connect(masterGain);
+  osc2.connect(amp2).connect(masterGain);
+  osc.start(t); osc.stop(t+dur);
+  osc2.start(t); osc2.stop(t+dur);
+}
+
+const HARM=['C3','G3','A3','E3','F3','D3','B3','G3'];
+let harmInterval=null;
+function startHarmony(){
+  if(!CFG.harmony)return;
+  let i=0;
+  harmInterval=setInterval(()=>{ playNote(HARM[i++%HARM.length],1.5,0.04); },1900);
+}
+function stopHarmony(){ clearInterval(harmInterval); harmInterval=null; }
+
+// ════════════════════════════════════════════════
+//  CANVAS
+// ════════════════════════════════════════════════
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+const gameWrap=document.getElementById('game-canvas-wrap');
+const gameScreen=document.getElementById('screen-game');
+function resize(){ canvas.width=gameWrap.clientWidth||innerWidth; canvas.height=gameWrap.clientHeight||innerHeight; }
+window.addEventListener('resize',resize);
+
+// ════════════════════════════════════════════════
+//  GAME STATE
+// ════════════════════════════════════════════════
+const BASE_GRAVITY=560;
+let notes=[],score=0,combo=0,maxCombo=0;
+let stats={perfect:0,good:0,miss:0};
+let running=false,songQueue=[],noteId=0,lastTime=0;
+let currentSongKey='twinkle', currentPresetKey='normal';
+
+const BASE_PERFECT=28, BASE_GOOD=60;
+function perfectWin(){ return BASE_PERFECT*CFG.window; }
+function goodWin()   { return BASE_GOOD*CFG.window;    }
+
+function resetStats(){ score=0;combo=0;maxCombo=0;stats={perfect:0,good:0,miss:0};notes=[];updateHUD(); }
+function updateHUD(){
+  document.getElementById('hud-score').textContent=score;
+  document.getElementById('hud-combo').textContent=combo>1?`COMBO × ${combo}`:'—';
+  document.getElementById('s-perfect').textContent=stats.perfect;
+  document.getElementById('s-good').textContent=stats.good;
+  document.getElementById('s-miss').textContent=stats.miss;
+}
+
+// ════════════════════════════════════════════════
+//  SPAWN
+// ════════════════════════════════════════════════
+// duration in beats → radius: 0.25→14px  1→24px  2→34px  4→46px
+function durToRadius(beats){
+  return Math.round(Math.min(50, Math.max(13, 13 + 14 * Math.log2(beats * 2 + 0.5))));
+}
+
+function spawnNote(name, beats=1){
+  const w=canvas.width, h=canvas.height;
+  const peakY=h*notePeakFrac(name);
+  const startY=h+32;
+  const gravity=BASE_GRAVITY*CFG.speed*CFG.speed;
+  const dy=startY-peakY;
+  const vy0=-Math.sqrt(2*gravity*dy);
+  const tUp=Math.abs(vy0)/gravity;
+
+  const maxDrift=w*0.48*CFG.angle;
+  const drift=(Math.random()*2-1)*maxDrift;
+  const x=clamp(w*(.12+Math.random()*.76), w*.06, w*.94);
+  const vx0=drift/tUp;
+
+  const t01=(noteToSemi(name)-SEMI_MIN)/(SEMI_MAX-SEMI_MIN);
+  const color=lerpColor('#38bdf8','#c084fc',t01);
+  const r=durToRadius(beats);
+
+  notes.push({
+    id:noteId++, name, beats, x, y:startY,
+    vx:vx0, vy:vy0, gravity,
+    color, r, peakY,
+    peaked:false, hit:false, glowAnim:0, trail:[],
+  });
+}
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+// ════════════════════════════════════════════════
+//  SCHEDULER
+// ════════════════════════════════════════════════
+function scheduleSong(song){
+  const beatMs=60000/song.bpm/CFG.speed;
+  let delay=500; songQueue=[];
+  for(const [note,dur] of song.notes){
+    const tid=setTimeout(()=>{ if(running)spawnNote(note, dur); },delay);
+    songQueue.push(tid); delay+=dur*beatMs;
+  }
+  const end=setTimeout(()=>{ if(running)endGame(); },delay+3000);
+  songQueue.push(end);
+}
+function clearSong(){ songQueue.forEach(clearTimeout); songQueue=[]; }
+
+// ════════════════════════════════════════════════
+//  HIT
+// ════════════════════════════════════════════════
+function tryHit(cx,cy){
+  let best=null,bd=Infinity;
+  for(const n of notes){
+    if(n.hit)continue;
+    const d=Math.hypot(cx-n.x,cy-n.y);
+    if(d<n.r+24&&d<bd){best=n;bd=d;}
+  }
+  if(!best)return;
+  const dp=Math.abs(best.y-best.peakY);
+  let grade,pts,col;
+  if(dp<=perfectWin()){ grade='完美!';pts=300;col='var(--good)';stats.perfect++; }
+  else if(dp<=goodWin()){ grade='良好';pts=150;col='var(--ok)';stats.good++; }
+  else{ grade='Early';pts=40;col='#94a3b8'; }
+  combo++; if(combo>maxCombo)maxCombo=combo;
+  score+=Math.floor(pts*(1+combo*.04));
+  best.hit=true; best.glowAnim=1;
+  if(CFG.sfx) playNote(best.name,.55,.42);
+  showHit(grade+(combo>2?` ×${combo}`:''),best.x,best.y,col);
+  updateHUD();
+}
+function showHit(text,x,y,color){
+  const el=document.createElement('div');
+  el.className='hit-text'; el.textContent=text;
+  el.style.cssText=`left:${x}px;top:${y}px;color:${color};`;
+  gameScreen.appendChild(el);
+  setTimeout(()=>el.remove(),700);
+}
+
+// ════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════
+function draw(ts){
+  if(!running)return;
+  const dt=Math.min((ts-lastTime)/1000,.05); lastTime=ts;
+  const w=canvas.width,h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  drawGuides(w,h);
+  for(let i=notes.length-1;i>=0;i--){
+    const n=notes[i];
+    if(!n.hit){
+      n.vy+=n.gravity*dt; n.x+=n.vx*dt; n.y+=n.vy*dt;
+      n.trail.push({x:n.x,y:n.y});
+      if(n.trail.length>16)n.trail.shift();
+      if(n.vy>0&&!n.peaked) n.peaked=true;
+      if(n.y>h+60){
+        if(n.peaked){ stats.miss++;combo=0;showHit('Miss',n.x,h*.65,'var(--miss)');updateHUD(); }
+        notes.splice(i,1); continue;
+      }
+    } else {
+      n.glowAnim-=dt*3.2;
+      if(n.glowAnim<=0){notes.splice(i,1);continue;}
+    }
+    drawNote(n);
+  }
+  requestAnimationFrame(draw);
+}
+
+function drawGuides(w,h){
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,0.025)';
+  ctx.setLineDash([4,10]); ctx.lineWidth=1;
+  for(let s=SEMI_MIN;s<=SEMI_MAX;s+=4){
+    const f=0.58-(s-SEMI_MIN)/(SEMI_MAX-SEMI_MIN)*0.50;
+    const y=h*f;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawNote(n){
+  const {x,y,r,color,hit,peaked,glowAnim,trail,peakY}=n;
+  if(!hit&&trail.length>1){
+    for(let i=1;i<trail.length;i++){
+      ctx.globalAlpha=(i/trail.length)*0.2;
+      ctx.beginPath();
+      ctx.arc(trail[i].x,trail[i].y,r*0.35*(i/trail.length),0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+  if(hit){
+    const s=1+(1-glowAnim)*2.8;
+    ctx.save();
+    ctx.globalAlpha=glowAnim*.5; ctx.strokeStyle=color; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(x,y,r*s,0,Math.PI*2); ctx.stroke();
+    ctx.globalAlpha=glowAnim*.22;
+    ctx.beginPath(); ctx.arc(x,y,r*s*1.7,0,Math.PI*2); ctx.stroke();
+    ctx.restore(); return;
+  }
+  const dp=Math.abs(y-peakY);
+  if(!peaked&&dp<goodWin()+18){
+    const intensity=1-dp/(goodWin()+18);
+    ctx.save();
+    ctx.shadowColor=color; ctx.shadowBlur=26*intensity;
+    ctx.beginPath(); ctx.arc(x,y,r+6*intensity,0,Math.PI*2);
+    ctx.fillStyle=color+'2a'; ctx.fill();
+    ctx.restore();
+  }
+  const g=ctx.createRadialGradient(x-r*.28,y-r*.28,2,x,y,r);
+  g.addColorStop(0,'#fff'); g.addColorStop(.28,color); g.addColorStop(1,color+'88');
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=g; ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.font=`700 ${r*.58}px Noto Sans SC`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(n.name.replace(/\d/,''),x,y);
+  // approach triangle
+  if(!peaked&&dp<goodWin()*1.9){
+    const a=Math.max(0,1-dp/(goodWin()*1.9));
+    ctx.save(); ctx.globalAlpha=a; ctx.fillStyle='#fff';
+    ctx.beginPath();
+    ctx.moveTo(x,y-r-14); ctx.lineTo(x-5,y-r-6); ctx.lineTo(x+5,y-r-6);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+}
+
+// ════════════════════════════════════════════════
+//  INPUT
+// ════════════════════════════════════════════════
+canvas.addEventListener('pointerdown',e=>{
+  if(!running)return;
+  audioCtx.resume();
+  const rect=canvas.getBoundingClientRect();
+  tryHit((e.clientX-rect.left)*(canvas.width/rect.width),
+         (e.clientY-rect.top)*(canvas.height/rect.height));
+});
+
+// ════════════════════════════════════════════════
+//  SCREENS
+// ════════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame(songKey){
+  currentSongKey=songKey;
+  audioCtx.resume();
+  resetStats(); running=true; notes=[];
+  // hud diff badge
+  const preset=PRESETS[currentPresetKey]||PRESETS.normal;
+  document.getElementById('hud-diff').textContent=
+    `${preset.label} · ${CFG.speed.toFixed(1)}× · 角度${Math.round(CFG.angle*100)}%`;
+  showScreen('screen-game');
+  resize();
+  startHarmony();
+  scheduleSong(SONGS[songKey]);
+  lastTime=performance.now();
+  requestAnimationFrame(draw);
+}
+
+function endGame(){
+  running=false; clearSong(); stopHarmony(); showResult();
+}
+
+function showResult(){
+  const song=SONGS[currentSongKey];
+  const total=stats.perfect+stats.good+stats.miss;
+  const acc=total?Math.round((stats.perfect+stats.good*.5)/total*100):0;
+  const [rl,rc]=acc>=95?['S','#fbbf24']:acc>=80?['A','#4ade80']:acc>=60?['B','#38bdf8']:['C','#94a3b8'];
+  const preset=PRESETS[currentPresetKey]||PRESETS.normal;
+  document.getElementById('r-songname').textContent=song.name;
+  document.getElementById('r-score').textContent=score;
+  document.getElementById('r-rank').innerHTML=`<span style="color:${rc}">${rl}</span>`;
+  document.getElementById('r-perfect').textContent=stats.perfect;
+  document.getElementById('r-good').textContent=stats.good;
+  document.getElementById('r-miss').textContent=stats.miss;
+  document.getElementById('r-acc').textContent=acc+'%';
+  document.getElementById('r-combo').textContent=maxCombo;
+  const badge=document.getElementById('r-diff-badge');
+  badge.textContent=preset.label;
+  badge.style.background=`color-mix(in srgb,${preset.color} 18%,#0f0f1c)`;
+  badge.style.color=preset.color;
+  badge.style.border=`1px solid ${preset.color}55`;
+  showScreen('screen-result');
+}
+
+// ════════════════════════════════════════════════
+//  SETTINGS UI
+// ════════════════════════════════════════════════
+function applyPreset(key){
+  currentPresetKey=key;
+  const p=PRESETS[key];
+  CFG.speed=p.speed; CFG.angle=p.angle; CFG.window=p.window;
+  document.getElementById('cfg-speed').value=p.speed;
+  document.getElementById('cfg-angle').value=p.angle;
+  document.getElementById('cfg-window').value=p.window;
+  syncSliderLabels();
+  document.querySelectorAll('.diff-btn').forEach(b=>
+    b.classList.toggle('active',b.dataset.preset===key));
+}
+
+function syncSliderLabels(){
+  const spd=parseFloat(document.getElementById('cfg-speed').value);
+  const ang=parseFloat(document.getElementById('cfg-angle').value);
+  const win=parseFloat(document.getElementById('cfg-window').value);
+  const vol=parseFloat(document.getElementById('cfg-vol').value);
+  CFG.speed=spd; CFG.angle=ang; CFG.window=win; CFG.vol=vol;
+  document.getElementById('cfg-speed-val').textContent=spd.toFixed(1)+'×';
+  document.getElementById('cfg-angle-val').textContent=Math.round(ang*100)+'%';
+  const wl=win>=1.8?'超宽松':win>=1.3?'宽松':win>=0.8?'标准':win>=0.55?'严格':'极严';
+  document.getElementById('cfg-window-val').textContent=wl;
+  document.getElementById('cfg-vol-val').textContent=Math.round(vol*100)+'%';
+  masterGain.gain.value=vol;
+}
+
+['cfg-speed','cfg-angle','cfg-window','cfg-vol'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    syncSliderLabels();
+    // deactivate preset if manually tweaked
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+    currentPresetKey='normal';
+  });
+});
+
+document.getElementById('cfg-sfx').addEventListener('change',e=>CFG.sfx=e.target.checked);
+document.getElementById('cfg-harmony').addEventListener('change',e=>CFG.harmony=e.target.checked);
+
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>applyPreset(btn.dataset.preset));
+});
+
+// tab switching
+document.querySelectorAll('.sel-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.sel-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.sel-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ════════════════════════════════════════════════
+//  SONG LIST UI
+// ════════════════════════════════════════════════
+let selectedSong='twinkle';
+function buildSongList(){
+  const list=document.getElementById('tab-songs');
+  list.innerHTML='';
+  for(const [key,song] of Object.entries(SONGS)){
+    const bars=song.notes.slice(0,24).map(([n])=>{
+      const t=(noteToSemi(n)-SEMI_MIN)/(SEMI_MAX-SEMI_MIN);
+      return Math.round(3+t*23);
+    });
+    const card=document.createElement('div');
+    card.className='song-card'+(key===selectedSong?' selected':'');
+    card.style.setProperty('--cc',song.color);
+    card.innerHTML=`
+      <div class="card-row">
+        <span class="card-title">${song.name}</span>
+        <span class="card-badge">${song.diff}</span>
+      </div>
+      <div class="card-meta">
+        <span>${song.bpm} BPM</span>
+        <span>${song.notes.length} 音符</span>
+        <span style="color:${song.color}">${key==='maiden'?'★★★★★':''}</span>
+      </div>
+      <div class="song-preview">
+        ${bars.map(h=>`<div class="preview-bar" style="height:${h}px;background:${song.color}"></div>`).join('')}
+      </div>
+    `;
+    card.addEventListener('click',()=>{
+      selectedSong=key;
+      document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+    list.appendChild(card);
+  }
+}
+
+document.getElementById('btn-play').addEventListener('click',()=>{ audioCtx.resume(); startGame(selectedSong); });
+document.getElementById('btn-esc').addEventListener('click',()=>{ running=false;clearSong();stopHarmony();notes=[];showScreen('screen-select'); });
+document.getElementById('btn-retry').addEventListener('click',()=>startGame(currentSongKey));
+document.getElementById('btn-back').addEventListener('click',()=>showScreen('screen-select'));
+
+syncSliderLabels();
+buildSongList();
+</script>
+</body>
+</html>

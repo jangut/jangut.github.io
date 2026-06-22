@@ -2,7 +2,7 @@
   "name": "合成生日蛋糕",
   "short_name": "生日蛋糕",
   "description": "2048 变种甜品合成小游戏",
-  "start_url": "2048-cake.html",
+  "start_url": "game/index.html",
   "display": "standalone",
   "background_color": "#fff4ed",
   "theme_color": "#ff8fb1",
