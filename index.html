@@ -580,6 +580,9 @@
     *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
 
@@ -797,11 +800,14 @@
       .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
       .replace(/\`(.+?)\`/g, '<code>$1</code>')
       .replace(/^---$/gm, '<hr>')
-      .replace(/\$(.+?)\$/g, '<code class="math">$$$1$$</code>');
+      ;
     var lines = html.split('\n');
     var out = [];
+    var inMath = false;
     for (var i = 0; i < lines.length; i++) {
       var l = lines[i].trim();
+      if (l.startsWith('$$')) { out.push(l); inMath = !inMath; continue; }
+      if (inMath) { out.push(l); continue; }
       if (!l) { out.push(''); continue; }
       if (l.startsWith('<')) { out.push(l); continue; }
       out.push('<p>' + l + '</p>');
@@ -861,6 +867,9 @@
       .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.text(); })
       .then(function(text) {
         panel.innerHTML = '<div class="article-body" style="max-width:780px;margin:0 auto;padding:24px;">' + simpleMarkdown(text) + '</div>';
+        if (window.renderMathInElement) {
+          renderMathInElement(panel, {delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});
+        }
       })
       .catch(function() {
         panel.innerHTML = '<div style="padding:48px;text-align:center;color:var(--accent3);">\u26a0 \u6587\u7ae0\u6682\u672a\u53d1\u5e03\uff0c\u656c\u8bf7\u671f\u5f85</div>';
