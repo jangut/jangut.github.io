@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -9,59 +9,125 @@
   *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none;}
   body{
     min-height:100vh;display:flex;justify-content:center;align-items:center;
-    background:#07070f;color:#e2e8f0;
+    background:#08080f;color:#e2e8f0;
     font-family:'Noto Sans SC',sans-serif;padding:20px;
-    background:radial-gradient(ellipse at 30% 20%,#1a0a2e 0%,#07070f 60%);
-  }
-  .hub{width:100%;max-width:420px;}
-  .hub h1{font-size:28px;font-weight:900;text-align:center;margin-bottom:6px;
+    overflow-x:hidden;}
+
+  /* 动态背景 */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse at 25% 20%,rgba(192,132,252,0.08) 0%,transparent 50%),
+      radial-gradient(ellipse at 75% 80%,rgba(56,189,248,0.06) 0%,transparent 50%);
+    animation:bgDrift 8s ease-in-out infinite alternate;}
+  @keyframes bgDrift{
+    0%{opacity:0.5;transform:scale(1) rotate(0deg);}
+    100%{opacity:1;transform:scale(1.05) rotate(1deg);}}
+
+  /* 扫描线 */
+  body::after{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.008) 2px,rgba(255,255,255,0.008) 4px);}
+
+  .hub{width:100%;max-width:420px;position:relative;z-index:1;}
+
+  /* 头部 */
+  .head{text-align:center;margin-bottom:28px;}
+  .head .console{font-size:38px;margin-bottom:6px;display:block;}
+  .head h1{font-size:26px;font-weight:900;
     background:linear-gradient(135deg,#c084fc,#38bdf8,#fb7185);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .hub .sub{text-align:center;font-size:13px;color:#64748b;margin-bottom:24px;}
-  .game-select{
-    width:100%;padding:12px 16px;border-radius:12px;border:1px solid #1a1a2e;
-    background:#0f0f1c;color:#e2e8f0;font-size:15px;font-weight:700;
-    appearance:auto;cursor:pointer;margin-bottom:20px;font-family:inherit;}
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    letter-spacing:2px;}
+  .head .sub{font-size:12px;color:#475569;margin-top:4px;letter-spacing:4px;}
+
+  /* 搜索框 */
+  .search-wrap{
+    display:flex;align-items:center;gap:10px;
+    background:rgba(15,15,30,0.8);border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;padding:0 14px;margin-bottom:20px;
+    transition:border-color .25s;}
+  .search-wrap:focus-within{border-color:rgba(192,132,252,0.3);}
+  .search-wrap .icon{font-size:16px;opacity:0.4;flex-shrink:0;}
+  .search-wrap input{
+    flex:1;background:none;border:none;outline:none;
+    color:#e2e8f0;font-size:14px;font-family:inherit;font-weight:700;
+    padding:13px 0;}
+  .search-wrap input::placeholder{color:#334155;font-weight:400;}
+
+  /* 游戏卡片 */
   .game-card{
-    display:flex;align-items:center;gap:16px;
-    background:#0f0f1c;border:1px solid #1a1a2e;border-radius:16px;
+    position:relative;display:flex;align-items:center;gap:16px;
+    background:linear-gradient(135deg,rgba(15,15,28,0.9),rgba(20,20,40,0.9));
+    border:1px solid rgba(255,255,255,0.06);border-radius:16px;
     padding:18px;margin-bottom:12px;cursor:pointer;
-    transition:border-color .2s,transform .1s;}
+    transition:all .25s;overflow:hidden;}
+  .game-card::before{
+    content:'';position:absolute;inset:0;border-radius:16px;opacity:0;
+    background:linear-gradient(135deg,rgba(192,132,252,0.08),transparent);
+    transition:opacity .3s;pointer-events:none;}
+  .game-card:hover{
+    border-color:rgba(192,132,252,0.25);
+    transform:translateY(-3px);
+    box-shadow:0 8px 32px rgba(192,132,252,0.12);}
+  .game-card:hover::before{opacity:1;}
   .game-card:active{transform:scale(0.97);}
-  .game-card .icon{font-size:40px;flex-shrink:0;}
+
+  .game-card .icon{font-size:36px;flex-shrink:0;width:48px;text-align:center;}
   .game-card .info{flex:1;}
-  .game-card .info h3{font-size:17px;font-weight:700;margin-bottom:2px;}
-  .game-card .info p{font-size:13px;color:#64748b;}
-  .game-card .arrow{font-size:18px;color:#475569;}
-  .game-card:hover{border-color:#c084fc;}
+  .game-card .info h3{font-size:16px;font-weight:700;margin-bottom:2px;}
+  .game-card .info p{font-size:12px;color:#475569;}
+  .game-card .arrow{
+    font-size:20px;color:#475569;flex-shrink:0;
+    transition:transform .2s,color .2s;}
+  .game-card:hover .arrow{color:#c084fc;transform:translateX(4px);}
+
+  .no-result{
+    display:none;text-align:center;color:#334155;font-size:14px;
+    padding:40px 0;}
+
+  @media(max-width:380px){
+    .head h1{font-size:22px;}
+    .game-card .icon{font-size:30px;width:40px;}
+    .game-card .info h3{font-size:14px;}}
 </style>
 </head>
 <body>
 <div class="hub">
-  <h1>🎮 HW游戏盒子</h1>
-  <p class="sub">选择一款游戏开始</p>
-  <input class="game-search" id="gameSearch" type="text" placeholder="🔍 搜索游戏..." oninput="filterGames(this.value)">
+  <div class="head">
+    <span class="console">🎮</span>
+    <h1>HW 游戏盒子</h1>
+    <div class="sub">SELECT YOUR GAME</div>
+  </div>
+
+  <div class="search-wrap">
+    <span class="icon">🔍</span>
+    <input type="text" placeholder="搜索游戏..." id="gameSearch" oninput="filterGames(this.value)">
+  </div>
+
   <div id="gameList">
-  <div class="game-card" onclick="goGame('2048-cake.html')">
-    <div class="icon">🍰</div></div>
-    <div class="info"><h3>合成生日蛋糕</h3><p>2048 变种 · 甜品合成小游戏</p></div></div>
-    <div class="arrow">›</div></div>
-  </div></div>
-  <div class="game-card" onclick="goGame('note-slice.html')">
-    <div class="icon">🎵</div></div>
-    <div class="info"><h3>切音符 NoteSlice</h3><p>节奏打击 · 音乐游戏</p></div></div>
-    <div class="arrow">›</div></div>
-  </div></div>
-</div></div>
+    <div class="game-card" onclick="goGame('2048-cake.html')">
+      <div class="icon">🍰</div>
+      <div class="info"><h3>合成生日蛋糕</h3><p>2048 变种 · 甜品合成小游戏</p></div>
+      <div class="arrow">›</div>
+    </div>
+    <div class="game-card" onclick="goGame('note-slice.html')">
+      <div class="icon">🎵</div>
+      <div class="info"><h3>切音符</h3><p>节奏打击 · 音乐游戏</p></div>
+      <div class="arrow">›</div>
+    </div>
+  </div>
+
+  <div class="no-result" id="noResult">没有找到匹配的游戏</div>
+</div>
+
 <script>
 function goGame(f){location=location.pathname.includes("/game/")?f:"game/"+f;}
 function filterGames(q){
-  q=q.toLowerCase().trim();
-  document.querySelectorAll(".game-card").forEach(c=>{
-    const t=c.textContent.toLowerCase();
-    c.style.display=!q||t.includes(q)?"flex":"none";
-  });
-}
+  q=q.toLowerCase().trim();let c=0;
+  document.querySelectorAll(".game-card").forEach(e=>{
+    const m=!q||e.textContent.toLowerCase().includes(q);
+    e.style.display=m?"flex":"none";if(m)c++;});
+  document.getElementById("noResult").style.display=c?"none":"block";}
 </script>
 </body>
 </html>
