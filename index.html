@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -339,8 +339,36 @@
     animation: blink 1s steps(1) infinite;
   }
   @keyframes blink{ 50%{ opacity: 0; } }
+  /* terminal 内链接 */
+  .terminal .out a{ color:var(--accent-cyan); text-decoration:underline; text-underline-offset:2px; }
+  .terminal .out a:hover{ color:var(--accent-green); }
+
+  /* ---- markdown content viewer ---- */
+  .content-view{ display:none; max-width:780px; margin:40px auto 60px; padding:0 24px; animation:fadeIn .3s ease; }
+  .content-view.active{ display:block; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+  .content-view.article-body{ line-height:1.8; color:var(--text-primary); }
+  .content-view.article-body h1{ font-size:26px; font-weight:700; margin:32px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  .content-view.article-body h2{ font-size:20px; font-weight:600; margin:28px 0 12px; }
+  .content-view.article-body h3{ font-size:17px; font-weight:600; margin:24px 0 10px; color:var(--accent-cyan); }
+  .content-view.article-body p{ margin:0 0 16px; color:var(--text-secondary); }
+  .content-view.article-body blockquote{ margin:16px 0; padding:12px 20px; border-left:3px solid var(--accent-amber); background:var(--bg-panel); border-radius:0 6px 6px 0; color:var(--text-muted); font-style:italic; }
+  .content-view.article-body code{ font-family:var(--mono); background:var(--bg-panel); padding:2px 6px; border-radius:4px; font-size:.85em; color:var(--accent-green); }
+  .content-view.article-body pre{ background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:16px 20px; overflow-x:auto; margin:16px 0; font-size:14px; }
+  .content-view.article-body pre code{ background:none; padding:0; color:var(--accent-cyan); }
+  .content-view.article-body hr{ border:none; border-top:1px dashed var(--line); margin:36px 0; }
+  .content-view.article-body strong{ color:var(--text-primary); }
+  .content-view.article-body em{ color:var(--accent-amber); }
+  .content-view .md-meta{ font-size:13px; color:var(--text-muted); margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--line); display:flex; gap:16px; align-items:center; }
+  .content-view .md-meta .back-link{ color:var(--accent-cyan); cursor:pointer; font-size:13px; }
+  .content-view .md-meta .back-link:hover{ text-decoration:underline; }
+
+  .hero-greeting{ margin: 32px 0 6px; display:flex; flex-direction:column; gap:6px; }
+  .hero-greeting .greet-line{ font-family:var(--sans); font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+  .hero-greeting .greet-sub{ font-family:var(--mono); font-size:13px; color:var(--text-muted); }
 
   .hero h1{
+
     font-family: var(--sans);
     font-size: 30px;
     font-weight: 700;
@@ -561,10 +589,10 @@
         <div class="root-label"><span class="chev">▾</span> blog/</div>
 
         <div class="folder open">
-          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 分类一</button>
+          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 控制理论</button>
           <ul class="files">
-            <li><a href="game/2048-cake.html"><span class="file-dot">·</span>🍰 合成生日蛋糕</a></li>
-            <li><a href="#" class="active"><span class="file-dot">·</span>文章标题二.md</a></li>
+            <li><a href="#" data-md="source/document/数学模型.md"><span class="file-dot">·</span>数学模型</a></li>
+            <li><a href="#" data-md="source/document/theory.md"><span class="file-dot">·</span>控制理论入门</a></li>
             <li><a href="#"><span class="file-dot">·</span>文章标题三.md</a></li>
           </ul>
         </div>
@@ -602,8 +630,8 @@
     <div class="editor">
 
       <div class="tabbar">
-        <button class="tab active" data-panel="panel-index"><span class="file-dot" style="color:var(--accent-cyan)">●</span> index.md</button>
-        <button class="tab" data-panel="panel-about"><span class="file-dot">○</span> about.md</button>
+        <button class="tab active" data-panel="panel-index"><span class="file-dot" style="color:var(--accent-cyan)">●</span>首页</button>
+        <button class="tab" data-panel="panel-about"><span class="file-dot">○</span> 个人信息</button>
       </div>
 
       <div class="editor-body">
@@ -614,24 +642,25 @@
           <div class="hero">
             <div class="hero-eyebrow">SYSTEM BOOT</div>
 
-            <div class="terminal">
-              <div class="row"><span class="prompt">$</span><span class="cmd">whoami</span></div>
-              <div class="row out">我是一名自动化专业的研究生</div>
-              <div class="row" style="margin-top:10px"><span class="prompt">$</span><span class="cmd">cat about.md | head -3</span></div>
-              <div class="row out">目前没有想法</div>
-              <div class="row out" style="padding-left:18px">分几个分类，更新频率大概是怎样，</div>
-              <div class="row out" style="padding-left:18px">给第一次来的读者一个预期<span class="cursor"></span></div>
+            <div class="hero-greeting">
+              <span class="greet-line">Hi, I’m jangut.</span>
+              <span class="greet-sub">控制理论 &middot; 用文字整理思路</span>
             </div>
 
             <h1>欢迎来到<span class="dim">这个博客</span></h1>
-            <p class="lede">左侧是真实的目录结构——按主题分类的文章，点开文件夹就能找到对应内容。这段引导文字也可以换成更适合你的说法。</p>
+            <p class="lede">左侧是我个人写的文章，点开文件夹就能找到对应内容。希望可以帮助到你</p>
 
             <div class="tag-row">
-              <span class="pill">#标签一</span>
-              <span class="pill">#标签二</span>
-              <span class="pill">#标签三</span>
-              <span class="pill">#标签四</span>
+              <span class="pill">#控制理论</span>
             </div>
+          </div>
+
+          <div id="content-view" class="content-view" data-active-md="">
+            <div class="md-meta">
+              <span class="back-link" id="back-link">← 返回首页</span>
+              <span id="md-title" style="font-weight:600;color:var(--text-primary);"></span>
+            </div>
+            <div id="md-body" class="article-body"></div>
           </div>
 
           <div class="feed">
@@ -705,11 +734,11 @@
         <!-- about 面板 -->
         <section class="panel" id="panel-about">
           <div class="about-wrap">
-            <h1>about.md</h1>
+            <h1>个人信息</h1>
             <div class="block">
-              <div><span class="k">name</span>: 你的名字</div>
-              <div><span class="k">role</span>: 一句话身份介绍</div>
-              <div><span class="k">background</span>: 简单的背景描述</div>
+              <div><span class="k">name</span>: Haowen Luo</div>
+              <div><span class="k">role</span>: 一个普普通通的科研打工仔</div>
+              <div><span class="k">background</span>: 英雄不问出处</div>
               <div><span class="k">writing_in</span>: 主要写些什么主题</div>
               <div><span class="k">status</span>: 当前在做的事情</div>
             </div>
@@ -770,6 +799,77 @@
   });
   scrim.addEventListener('click', closeSidebar);
   sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', closeSidebar));
+
+  // --- Markdown viewer ---
+  const contentView = document.getElementById('content-view');
+  const mdBody = document.getElementById('md-body');
+  const mdTitle = document.getElementById('md-title');
+
+  function simpleMarkdown(text) {
+    var html = text
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+      .replace(/\`(.+?)\`/g, '<code>$1</code>')
+      .replace(/^---$/gm, '<hr>')
+      .replace(/\$(.+?)\$/g, '<code class="math">$$$1$$</code>');
+    // Wrap non-tag lines in <p>
+    var lines = html.split('\n');
+    var out = [];
+    for (var i = 0; i < lines.length; i++) {
+      var l = lines[i].trim();
+      if (!l) { out.push(''); continue; }
+      if (l.startsWith('<')) { out.push(l); continue; }
+      out.push('<p>' + l + '</p>');
+    }
+    // Group consecutive <li> into <ul>
+    html = out.join('\n');
+    html = html.replace(/(<li>.*?\n?)+/g, function(m) {
+      if (!m.includes('<li>')) return m;
+      return '<ul>' + m + '</ul>';
+    });
+    return html;
+  }
+
+  function openContent(mdPath, title) {
+    mdTitle.textContent = title;
+    fetch(mdPath)
+      .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.text(); })
+      .then(function(text) {
+        mdBody.innerHTML = simpleMarkdown(text);
+        contentView.classList.add('active');
+        contentView.dataset.activeMd = mdPath;
+        document.querySelector('.feed').style.display = 'none';
+        document.querySelector('.hero').style.display = 'none';
+        document.querySelector('.editor-body').scrollTo({top: 0, behavior: 'smooth'});
+      })
+      .catch(function() {
+        mdBody.innerHTML = '<p style="color:var(--accent3);">\u26a0 \u6587\u7ae0\u6682\u672a\u53d1\u5e03\uff0c\u656c\u8bf7\u671f\u5f85</p>';
+        contentView.classList.add('active');
+        document.querySelector('.feed').style.display = 'none';
+        document.querySelector('.hero').style.display = 'none';
+      });
+  }
+
+  document.getElementById('back-link').addEventListener('click', function() {
+    contentView.classList.remove('active');
+    document.querySelector('.feed').style.display = '';
+    document.querySelector('.hero').style.display = '';
+    document.querySelector('.editor-body').scrollTo({top: 0, behavior: 'smooth'});
+  });
+
+  // Sidebar md links
+  document.querySelectorAll('[data-md]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      openContent(this.dataset.md, this.textContent.trim());
+    });
+  });
 </script>
 
 </body>
