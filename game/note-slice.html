@@ -889,6 +889,27 @@ if(window._errs.length){
   e.textContent="\u26A0\uFE0F "+window._errs.join(" | ");
   document.body.appendChild(e);
 }
-</script>
+
+// 侧滑返回：游戏内左边缘右滑 → 回选歌
+(function(){
+  let sx=0,sy=0,swiping=false;
+  const gs=document.getElementById("screen-game");
+  if(gs){
+    gs.addEventListener("pointerdown",function(e){sx=e.clientX;sy=e.clientY;swiping=sx<30;});
+    gs.addEventListener("pointerup",function(e){
+      if(!swiping)return;swiping=false;
+      var dx=e.clientX-sx,dy=e.clientY-sy;
+      if(dx>50&&Math.abs(dy)<60&&running){
+        running=false;clearSong();stopHarmony();notes=[];
+        showScreen("screen-select");
+      }
+    });
+  }
+})();
+
+// 安卓返回键处理
+window.history.pushState(null,null,window.location.href);
+window.addEventListener("popstate",function(){window.location.href="/game/index.html";});
+try{document.addEventListener("backbutton",function(e){e.preventDefault();window.location.href="/game/index.html";});}catch(e){}</script>
 </body>
 </html>

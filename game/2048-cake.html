@@ -830,6 +830,11 @@
   initGridBackground();
   // Don't initBoard yet — wait for start button
 
+  // 安卓返回键 → 回游戏盒
+  window.history.pushState(null,null,window.location.href);
+  window.addEventListener("popstate",function(){window.location.href="/game/index.html";});
+  try{document.addEventListener("backbutton",function(e){e.preventDefault();window.location.href="/game/index.html";});}catch(e){}
+
   // 显示 JS 报错（如有）
   if(window._errs.length){
     var e = document.createElement('div');
