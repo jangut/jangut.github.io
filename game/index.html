@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -45,18 +45,18 @@
   <h1>🎮 HW游戏盒子</h1>
   <p class="sub">选择一款游戏开始</p>
 
-  <select class="game-select" id="gameSelect" onchange="if(this.value) location=this.value">
+  <select class="game-select" id="gameSelect" onchange="if(this.value) goGame(this.value)">
     <option value="">📋 选择游戏...</option>
     <option value="2048-cake.html">🍰 合成生日蛋糕</option>
     <option value="note-slice.html">🎵 切音符 NoteSlice</option>
   </select>
 
-  <div class="game-card" onclick="location='2048-cake.html'">
+  <div class="game-card" onclick="goGame('2048-cake.html')">
     <div class="icon">🍰</div>
     <div class="info"><h3>合成生日蛋糕</h3><p>2048 变种 · 甜品合成小游戏</p></div>
     <div class="arrow">›</div>
   </div>
-  <div class="game-card" onclick="location='note-slice.html'">
+  <div class="game-card" onclick="goGame('note-slice.html')">
     <div class="icon">🎵</div>
     <div class="info"><h3>切音符 NoteSlice</h3><p>节奏打击 · 音乐游戏</p></div>
     <div class="arrow">›</div>
