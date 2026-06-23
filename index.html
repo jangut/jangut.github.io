@@ -18,7 +18,8 @@
 <link rel="prefetch" as="audio" href="source/music/victory.mp3" type="audio/mpeg">
 <link rel="prefetch" as="video" href="source/video/fail.mp4" type="video/mp4">
 <link rel="prefetch" as="video" href="source/video/victory.mp4" type="video/mp4">
- <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
@@ -449,7 +450,7 @@
     width: 100%;
     max-width: 140px;
     height: auto;
-    opacity: 0.65;
+    opacity: 0.35;
     transition: opacity 0.4s ease;
   }
   .sidebar-footer .cat-wrap:hover img{
@@ -1127,30 +1128,7 @@
   .toc-peek svg { width: 14px; height: 14px; }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">
-  // 猫猫弹窗
-  document.addEventListener('DOMContentLoaded', function() {
-    var catWrap = document.getElementById('catWrap');
-    var catModal = document.getElementById('catModalOverlay');
-    var catClose = document.getElementById('catModalClose');
-    if (catWrap && catModal) {
-      catWrap.addEventListener('click', function() {
-        catModal.classList.add('open');
-      });
-      if (catClose) {
-        catClose.addEventListener('click', function() {
-          catModal.classList.remove('open');
-        });
-      }
-      catModal.addEventListener('click', function(e) {
-        if (e.target === catModal) {
-          catModal.classList.remove('open');
-        }
-      });
-    }
-  });
-
-</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
@@ -1167,7 +1145,7 @@
 
   <div class="app">
 
-    <div class="scrim" id="scrim"></div>
+    <div class="scrim" id="scrim" aria-hidden="true"></div>
 
     <!-- ================= SIDEBAR ================= -->
     <aside class="sidebar" id="sidebar">
@@ -1213,6 +1191,7 @@
       </nav>
 
       <div class="sidebar-footer">
+        <div class="label">DONATE:猫猫祝你发财</div>
         <div class="cat-wrap" id="catWrap">
           <img src="source/image/cat.svg" alt="猫猫" class="footer-cat" id="footerCat">
         </div>
@@ -1584,13 +1563,13 @@
 
 
 <!-- ================= 猫猫弹窗 ================= -->
-<div class="cat-modal-overlay" id="catModalOverlay">
+<div class="cat-modal-overlay" id="catModalOverlay" role="dialog" aria-modal="true" aria-labelledby="catModalTitle" aria-hidden="true">
   <div class="cat-modal">
-    <button class="cat-modal-close" id="catModalClose">&times;</button>
+    <button class="cat-modal-close" id="catModalClose" aria-label="关闭弹窗">&times;</button>
     <div class="cat-modal-body">
       <img src="source/image/cat.svg" alt="猫" class="cat-modal-img">
       <div class="cat-modal-text">
-        <h3>抓到一只猫猫！</h3>
+        <h3 id="catModalTitle">抓到一只猫猫！</h3>
         <p>喵～你发现我啦！</p>
         <p>这里是 jangut 的博客小角落。</p>
         <p>如果这里的文章对你有帮助，那这只猫猫就很开心啦 🐱</p>
@@ -1599,8 +1578,55 @@
     </div>
   </div>
 </div>
+
+<script>
+
+  // 猫猫弹窗
+  document.addEventListener('DOMContentLoaded', function() {
+    var catWrap = document.getElementById('catWrap');
+    var catModal = document.getElementById('catModalOverlay');
+    var catClose = document.getElementById('catModalClose');
+    var prevFocus = null;
+    function openModal() {
+      if (!catModal) return;
+      prevFocus = document.activeElement;
+      catModal.classList.add('open');
+      catModal.setAttribute('aria-hidden', 'false');
+      if (catClose) setTimeout(function() { catClose.focus(); }, 50);
+    }
+    function closeModal() {
+      if (!catModal) return;
+      catModal.classList.remove('open');
+      catModal.setAttribute('aria-hidden', 'true');
+      if (prevFocus) { prevFocus.focus(); prevFocus = null; }
+    }
+    if (catWrap && catModal) {
+      catWrap.addEventListener('click', openModal);
+      catWrap.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
+      });
+      if (catClose) catClose.addEventListener('click', closeModal);
+      catModal.addEventListener('click', function(e) {
+        if (e.target === catModal) closeModal();
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && catModal.classList.contains('open')) closeModal();
+      });
+      catModal.addEventListener('keydown', function(e) {
+        if (e.key !== 'Tab') return;
+        var fb = catModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (fb.length === 0) return;
+        var first = fb[0], last = fb[fb.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+    }
+  });
+
+</script>
 </body>
 </html>
+
 
 
 
