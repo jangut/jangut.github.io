@@ -1,0 +1,166 @@
+*** Begin Patch
+*** Update File: C:\Git\repositories\jangut.github.io\source\document\数学模型.md
+@@
+@@ -1,12 +1,20 @@
+-![alt text](source/image/数学模型.svg)
++![alt text](../image/数学模型.svg)
+ ---
+ 
+ ## 1. 微分方程建立
+ 
+ ### RLC网络
+ > 在RLC网络中,有如下微分关系
+ >
+ >
+ 
+ $$
+     u_L = L\frac{di_L}{dt}
+ $$
+ $$
+     i_C = C\frac{du_c}{dt}
+ $$
++
++考虑一个串联 RLC 电路，由 KVL 可得：
++
++$$
++    u_L + u_R + u_C = u(t)
++$$
++
++代入元件关系 $u_R = Ri_L$、$u_L = L\frac{di_L}{dt}$、$i_L = C\frac{du_C}{dt}$，整理为关于 $u_C$ 的二阶微分方程：
++
++$$
++    LC\frac{d^2 u_C}{dt^2} + RC\frac{du_C}{dt} + u_C = u(t)
++$$
++
++这是一个典型的二阶线性时不变系统的数学模型。
++
+ ### 力学系统
++
++力学系统遵循牛顿第二定律。对于常见质量-弹簧-阻尼系统：
++
++$$
++    m\frac{d^2 x}{dt^2} + c\frac{dx}{dt} + kx = F(t)
++$$
++
++其中 $m$ 为质量，$c$ 为阻尼系数，$k$ 为弹簧刚度，$F(t)$ 为外力。
++
+ ### MSB系统
++
++MSB 系统即质量-弹簧-阻尼系统 (Mass-Spring-Damper)，本质是力学系统的一个特例：
++
++$$
++    M\ddot{x} + B\dot{x} + Kx = F
++$$
++
++这里 $M$ 代表质量，$B$ 代表阻尼，$K$ 代表刚度。该模型是理解振动分析和控制系统设计的基础。
++
+ ### 机械转动系统
++
++机械转动系统将平动中的物理量替换为旋转量：质量 $m$ → 转动惯量 $J$，位移 $x$ → 角位移 $\theta$，力 $F$ → 转矩 $T$。
++
++$$
++    J\frac{d^2\theta}{dt^2} + B\frac{d\theta}{dt} + K\theta = T(t)
++$$
++
++其中 $J$ 为转动惯量，$B$ 为旋转阻尼系数，$K$ 为扭转刚度，$T(t)$ 为外加转矩。
++
+ ### 拖动系统
++
++拖动系统描述电机驱动负载的动力学行为，典型形式为：
++
++$$
++    J\frac{d\omega}{dt} + B\omega = T_e - T_L
++$$
++
++其中 $\omega$ 为转子角速度，$T_e$ 为电磁转矩，$T_L$ 为负载转矩。该方程是电机调速控制的基础模型。
++
+ ---
+ 
+ ## 2. 传递函数
+@@ -46,3 +136,12 @@
+ ### 基本概念
++
++传递函数定义为零初始条件下输出拉氏变换与输入拉氏变换之比：
++
++$$
++    G(s) = \frac{Y(s)}{U(s)} = \frac{b_m s^m + b_{m-1}s^{m-1} + \cdots + b_0}{a_n s^n + a_{n-1}s^{n-1} + \cdots + a_0}
++$$
++
++关键概念：
++- **阶次**：分母多项式最高次数 $n$，通常 $n \ge m$（真有理分式）
++- **极点**：分母多项式 $=0$ 的根
++- **零点**：分子多项式 $=0$ 的根
++- **特征方程**：$a_n s^n + a_{n-1}s^{n-1} + \cdots + a_0 = 0$
++
+ ### 方框图
++
++方框图是系统传递函数的图形化表示。基本连接方式有三种：
++
++- **串联**：$G(s) = G_1(s)G_2(s)$
++- **并联**：$G(s) = G_1(s) + G_2(s)$
++- **反馈**：$\displaystyle \frac{Y(s)}{R(s)} = \frac{G(s)}{1 \pm G(s)H(s)}$
++
++> 负反馈取"+"，正反馈取"-"，这是经典控制中最常用的化简规则。
++
+ ### 梅森公式
++
++梅森公式直接从信号流图求取传递函数，无需逐步化简：
++
++$$
++    G(s) = \frac{\displaystyle\sum_{k} P_k \Delta_k}{\Delta}
++$$
++
++其中：
++- $\Delta = 1 - \sum L_a + \sum L_b L_c - \cdots$（特征式）
++- $P_k$ — 第 $k$ 条前向通路的增益
++- $\Delta_k$ — 除去与第 $k$ 条前向通路接触的回路的 $\Delta$ 值
++- $L_a$ — 所有单回路增益之和
++- $L_b L_c$ — 所有两两互不接触回路增益乘积之和
++
+ ---
+ 
+ ## 3. 频率特性
+@@ -51,11 +150,30 @@
+ ### 定义
++
++频率特性的三种常用图示法：
++
++- **Bode 图**：对数幅频曲线 ($20\log|G(j\omega)|$ vs $\log\omega$) 和相频曲线 ($\angle G(j\omega)$ vs $\log\omega$)
++- **Nyquist 图**：在极坐标中绘制 $G(j\omega)$ 随 $\omega$ 从 $0\to\infty$ 变化的轨迹
++- **Nichols 图**：对数幅值 vs 相位曲线
++
++> 频率特性是经典控制中最直观的分析工具，很多系统设计要求直接用频域指标表述。
++
+ ---
+ 
+ ## 4. 状态空间
+@@ -98,3 +216,86 @@
+ ### 分析与综合
++
++### 稳定性分析
++
++**Lyapunov 稳定性**：对于系统 $\dot{\boldsymbol{x}} = \boldsymbol{A}\boldsymbol{x}$，若 $\boldsymbol{A}$ 的所有特征值均具有负实部，则系统渐近稳定。
++
++**Routh 判据**：通过特征方程的 Routh 表判断稳定性，无需解出极点。
++
++### 能控性与能观性
++
++- **能控性**：系统是否能在有限时间内由任意初态转移到任意终态 — 由能控性矩阵 $\mathcal{C} = [\boldsymbol{B} \; \boldsymbol{A}\boldsymbol{B} \; \cdots \; \boldsymbol{A}^{n-1}\boldsymbol{B}]$ 的秩判断
++- **能观性**：能否在有限时间内由输出测量值唯一确定系统的初始状态 — 由能观性矩阵 $\mathcal{O} = [\boldsymbol{C}^T \; (\boldsymbol{CA})^T \; \cdots \; (\boldsymbol{CA}^{n-1})^T]^T$ 的秩判断
++
++### 综合设计
++
++**状态反馈**：$u = -\boldsymbol{K}\boldsymbol{x} + r$，通过配置极点的方式使系统满足动态性能指标。状态反馈不改变系统的能观性。
++
++**状态观测器**：当系统状态无法直接测量时，构造观测器重构状态：
++
++$$
++    \dot{\hat{\boldsymbol{x}}} = \boldsymbol{A}\hat{\boldsymbol{x}} + \boldsymbol{B}\boldsymbol{u} + \boldsymbol{L}(\boldsymbol{y}-\boldsymbol{C}\hat{\boldsymbol{x}})
++$$
++
++**分离原理**：状态反馈 + 状态观测器可以独立设计，闭环系统的极点为二者极点之和（分离性）。
++
++---
++
++*整理自控制理论学习笔记，持续更新中。*
+*** End Patch
