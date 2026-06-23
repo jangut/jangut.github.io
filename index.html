@@ -588,14 +588,17 @@
   }
 
   .toc-panel {
+    position: fixed;
+    right: 0;
+    top: 88px;
+    bottom: 28px;
     width: 220px;
-    height: 100%;
     background: var(--bg-panel);
     border-left: 1px solid var(--line);
     display: none;
     flex-direction: column;
     overflow: hidden;
-    flex-shrink: 0;
+    z-index: 25;
   }
   .toc-panel.open {
     display: flex;
@@ -746,12 +749,6 @@
         </a>
       </nav>
 
-      <div class="sidebar-footer">
-        <div class="label">// 备注</div>
-        <div class="couplet">
-          Journey across new ground,unlock tomorrow!
-        </div>
-      </div>
     </aside>
 
     <!-- ================= EDITOR / MAIN ================= -->
@@ -852,6 +849,12 @@
         pathEl.textContent = pf ? pf : (panelId.replace('panel-', ''));
       }
     }
+    // Auto show/hide TOC based on panel type
+    if (panelId === 'panel-index') {
+      hideTOC();
+    } else if (panelId && panelId.indexOf('panel-doc-') !== -1) {
+      showTOC();
+    }
   };
   tabs.forEach(function(tab) {
     tab.addEventListener('click', function() {
@@ -904,6 +907,14 @@
   var dynamicId = 0;
   var tabbar = document.querySelector('.tabbar');
   var bodyInner = document.querySelector('.editor-body-inner');
+  var indexTab = document.querySelector('[data-panel="panel-index"]');
+
+  function updateIndexTabVisibility() {
+    var docTabs = document.querySelectorAll('.tab[data-md-panel]');
+    if (indexTab) {
+      indexTab.style.display = docTabs.length > 0 ? 'none' : 'flex';
+    }
+  }
 
   function simpleMarkdown(text) {
     var html = text
@@ -962,6 +973,9 @@
     tab.innerHTML = '<span class="file-dot">\u25cb</span> ' + title + ' <span class="tab-close" style="margin-left:6px;cursor:pointer;opacity:.5;font-size:14px;">\u2715</span>';
     tabbar.appendChild(tab);
 
+    // Update index tab visibility
+    updateIndexTabVisibility();
+
     // Create panel
     var panel = document.createElement('section');
     panel.className = 'panel';
@@ -1002,11 +1016,21 @@
     var panel = document.getElementById(panelId);
     if (panel) panel.remove();
     if (tab) tab.remove();
-    // Switch back to index if the active panel was closed
-    var activePanel = document.querySelector('.panel.active');
-    if (!activePanel || activePanel.id === panelId || !activePanel) {
+    updateIndexTabVisibility();
+
+    // Check if there are any remaining document tabs
+    var docTabs = document.querySelectorAll('.tab[data-md-panel]');
+    if (docTabs.length === 0) {
+      // No more documents, switch to index
       switchToPanel('panel-index');
       hideTOC();
+    } else {
+      // Switch to first remaining doc
+      var activePanel = document.querySelector('.panel.active');
+      if (!activePanel || activePanel.id === panelId) {
+        var nextTab = document.querySelector('.tab[data-md-panel]');
+        if (nextTab) switchToPanel(nextTab.dataset.panel);
+      }
     }
   }
 
@@ -1072,18 +1096,6 @@
 
   document.getElementById('tocPeek').addEventListener('click', toggleTOC);
   document.getElementById('tocClose').addEventListener('click', hideTOC);
-
-  var origSwitch = window.switchToPanel;
-  if (origSwitch) {
-    window.switchToPanel = function(panelId) {
-      origSwitch(panelId);
-      if (panelId && panelId.indexOf('panel-doc-') !== -1) {
-        setTimeout(function() { buildTOC(); showTOC(); }, 100);
-      } else {
-        hideTOC();
-      }
-    };
-  }
 
 // Sidebar md links
   document.querySelectorAll('[data-md]').forEach(function(a) {
