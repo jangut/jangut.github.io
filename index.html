@@ -311,6 +311,7 @@
     display: flex;
     min-height: 0;
     min-width: 0;
+    height: 100%;
   }  .editor-body{
     flex: 1;
     overflow-y: auto;
@@ -588,6 +589,7 @@
 
   .toc-panel {
     width: 220px;
+    height: 100%;
     background: var(--bg-panel);
     border-left: 1px solid var(--line);
     display: none;
@@ -661,27 +663,28 @@
     font-size: 12px;
     font-family: var(--mono);
   }
-  .toc-toggle {
+  .toc-peek {
     display: flex;
-    align-items: center;
-    background: none;
-    border: none;
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 44px;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-right: none;
+    border-radius: 6px 0 0 6px;
     color: var(--text-muted);
     cursor: pointer;
-    font-size: 14px;
-    padding: 9px 12px;
-    border-radius: 8px 8px 0 0;
-    margin: 4px 4px 0 0;
-    transition: color .15s, background .15s;
-    white-space: nowrap;
+    z-index: 25;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
   }
-  .toc-toggle:hover {
-    color: var(--text-secondary);
-    background: var(--bg-elevated);
-  }
-  .toc-toggle.active {
-    color: var(--accent-cyan);
-  }
+  .toc-peek:hover { opacity: .8; }
+  .toc-peek.hidden { display: none; }
+  .toc-peek svg { width: 14px; height: 14px; }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -756,11 +759,14 @@
 
       <div class="tabbar">
         <button class="tab active" data-panel="panel-index"><span class="file-dot" style="color:var(--accent-cyan)">●</span>首页</button>
-        <button class="toc-toggle" id="tocToggle" title="显示/隐藏目录">📑</button>
 
       </div>
       <button class="sidebar-peek" id="sidebarPeek" aria-label="打开侧边栏">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <button class="toc-peek" id="tocPeek" title="显示目录">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
 
       <div class="editor-main"><div class="editor-body">
@@ -1045,17 +1051,17 @@
   function showTOC() {
     buildTOC();
     var tp = document.getElementById('tocPanel');
-    var tt = document.getElementById('tocToggle');
+    var tt = document.getElementById('tocPeek');
     if (tp) tp.classList.add('open');
-    if (tt) tt.classList.add('active');
+    if (tt) { tt.classList.add('active'); tt.classList.add('hidden'); }
     tocVisible = true;
   }
 
   function hideTOC() {
     var tp = document.getElementById('tocPanel');
-    var tt = document.getElementById('tocToggle');
+    var tt = document.getElementById('tocPeek');
     if (tp) tp.classList.remove('open');
-    if (tt) tt.classList.remove('active');
+    if (tt) { tt.classList.remove('hidden'); }
     tocVisible = false;
   }
 
@@ -1064,7 +1070,7 @@
     else { showTOC(); }
   }
 
-  document.getElementById('tocToggle').addEventListener('click', toggleTOC);
+  document.getElementById('tocPeek').addEventListener('click', toggleTOC);
   document.getElementById('tocClose').addEventListener('click', hideTOC);
 
   var origSwitch = window.switchToPanel;
