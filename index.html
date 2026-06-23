@@ -800,6 +800,7 @@
       .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
       .replace(/\`(.+?)\`/g, '<code>$1</code>')
       .replace(/^---$/gm, '<hr>')
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;height:auto;display:block;margin:0 auto;">')
       ;
     var lines = html.split('\n');
     var out = [];
