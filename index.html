@@ -495,7 +495,8 @@
     transform: scale(1.03);
   }
   /* --- 粒子 & 弹入 --- */
-  @keyframes popIn{
+  /* 二维码缩放弹入 */
+@keyframes popIn{
     from{ transform: scale(0); opacity: 0; }
     to{ transform: scale(1); opacity: 1; }
   }
@@ -515,7 +516,13 @@
     margin-top: 8px;
   }
 
-  /* --- 猫猫弹窗 --- */
+  /*
+  猫猫弹窗（打赏 / 展示二维码）
+  - overlay 占满全屏，毛玻璃背景
+  - .open 类控制显示/隐藏
+  - 弹入动画 catPopin
+  - 打赏按钮触发粒子特效 + 二维码 canvas 渲染
+*/
   .cat-modal-overlay{
     display: none;
     position: fixed;
@@ -527,7 +534,8 @@
     justify-content: center;
   }
   .cat-modal-overlay.open{ display: flex; }
-  @keyframes catPopin{
+  /* 弹窗入场：缩放 + 上弹 */
+@keyframes catPopin{
     from{ opacity:0; transform:scale(0.85) translateY(12px); }
     to{ opacity:1; transform:scale(1) translateY(0); }
   }
@@ -755,18 +763,76 @@
   .content-view{ display:none; max-width:780px; margin:40px auto 60px; padding:0 24px; animation:fadeIn .3s ease; }
   .content-view.active{ display:block; }
   @keyframes fadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
-  .content-view.article-body{ line-height:1.8; color:var(--text-primary); }
-  .content-view.article-body h1{ font-size:26px; font-weight:700; margin:32px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line); }
-  .content-view.article-body h2{ font-size:20px; font-weight:600; margin:28px 0 12px; }
-  .content-view.article-body h3{ font-size:17px; font-weight:600; margin:24px 0 10px; color:var(--accent-cyan); }
-  .content-view.article-body p{ margin:0 0 16px; color:var(--text-secondary); }
-  .content-view.article-body blockquote{ margin:16px 0; padding:12px 20px; border-left:3px solid var(--accent-amber); background:var(--bg-panel); border-radius:0 6px 6px 0; color:var(--text-muted); font-style:italic; }
-  .content-view.article-body code{ font-family:var(--mono); background:var(--bg-panel); padding:2px 6px; border-radius:4px; font-size:.85em; color:var(--accent-green); }
-  .content-view.article-body pre{ background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:16px 20px; overflow-x:auto; margin:16px 0; font-size:14px; }
-  .content-view.article-body pre code{ background:none; padding:0; color:var(--accent-cyan); }
-  .content-view.article-body hr{ border:none; border-top:1px dashed var(--line); margin:36px 0; }
-  .content-view.article-body strong{ color:var(--text-primary); }
-  .content-view.article-body em{ color:var(--accent-amber); }
+  .article-body{ line-height:1.8; color:var(--text-primary); }
+  .article-body h1{ font-size:26px; font-weight:700; margin:32px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  .article-body h2{ font-size:20px; font-weight:600; margin:28px 0 12px; }
+  .article-body h3{ font-size:17px; font-weight:600; margin:24px 0 10px; color:var(--accent-cyan); }
+  .article-body p{ margin:0 0 16px; color:var(--text-secondary); }
+  .article-body blockquote{ margin:16px 0; padding:12px 20px; border-left:3px solid var(--accent-amber); background:var(--bg-panel); border-radius:0 6px 6px 0; color:var(--text-muted); font-style:italic; }
+  .article-body code{ font-family:var(--mono); background:var(--bg-panel); padding:2px 6px; border-radius:4px; font-size:.85em; color:var(--accent-green); }
+  .article-body pre{ background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:16px 20px; overflow-x:auto; margin:16px 0; font-size:14px; }
+  .math-block{ text-align: center; margin: 20px 0; overflow-x: auto; }
+  .article-body pre code{ background:none; padding:0; color:var(--accent-cyan); }
+  .article-body hr{ border:none; border-top:1px dashed var(--line); margin:36px 0; }
+  /*
+  marked 生成的 Markdown HTML 样式
+  包括：表格、列表、代码块、链接、引用等
+  覆盖默认的 article-body 作用域
+*/
+  .article-body ul,
+  .article-body ol{
+    padding-left: 24px;
+    margin: 0 0 16px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+  .article-body li{
+    margin-bottom: 4px;
+  }
+  .article-body a{
+    color: var(--accent-cyan);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s ease;
+  }
+  .article-body a:hover{
+    color: var(--accent-green);
+  }
+  .article-body blockquote p{
+    margin: 0;
+    color: inherit;
+  }
+  .article-body table{
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .article-body th,
+  .article-body td{
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  .article-body th{
+    background: var(--bg-elevated);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .article-body td{
+    color: var(--text-secondary);
+  }
+  .article-body pre{
+    position: relative;
+  }
+  .math-block{ text-align: center; margin: 20px 0; overflow-x: auto; }
+  .article-body pre code{
+    background: none;
+    padding: 0;
+    color: var(--accent-cyan);
+  }
+  .article-body strong{ color:var(--text-primary); }
+  .article-body em{ color:var(--accent-amber); }
   .content-view .md-meta{ font-size:13px; color:var(--text-muted); margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--line); display:flex; gap:16px; align-items:center; }
   .content-view .md-meta .back-link{ color:var(--accent-cyan); cursor:pointer; font-size:13px; }
   .content-view .md-meta .back-link:hover{ text-decoration:underline; }
@@ -1190,6 +1256,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
 
@@ -1207,7 +1276,7 @@
 
     <div class="scrim" id="scrim" aria-hidden="true"></div>
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- ================= 侧边栏（文件树 / 游戏链接 / 猫猫） ================= -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <span>EXPLORER</span>
@@ -1330,14 +1399,14 @@
 </div>
 
 <script>
-  // 文件夹展开/收起
+  // ==================== 侧边栏交互 ====================
   document.querySelectorAll('.folder-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       btn.parentElement.classList.toggle('open');
     });
   });
 
-  // 标签页切换
+  // ==================== 标签页（Tab）切换 ====================
   const tabs = document.querySelectorAll('.tab');
   const panels = document.querySelectorAll('.panel');
   // Use switchToPanel for all tab clicks (handles static + dynamic)
@@ -1372,7 +1441,7 @@
     });
   });
 
-  // 移动端侧边栏
+  // ==================== 移动端：侧边栏手势 + 蒙层 ====================
   const sidebar = document.getElementById('sidebar');
   const menuToggle = document.getElementById('menuToggle');
   const scrim = document.getElementById('scrim');
@@ -1412,7 +1481,7 @@
     }
   }, {passive: true});
 
-  // --- Markdown viewer: dynamic closable tabs ---
+  // ==================== Markdown 文档阅读器 ====================
   var dynamicId = 0;
   var tabbar = document.querySelector('.tabbar');
   var bodyInner = document.querySelector('.editor-body-inner');
@@ -1425,7 +1494,7 @@
     }
   }
 
-  function simpleMarkdown(text) {
+    function simpleMarkdown(text) {
     var html = text
       .replace(/^### (.+)$/gm, '<h3>$1</h3>')
       .replace(/^## (.+)$/gm, '<h2>$1</h2>')
@@ -1515,10 +1584,15 @@
     fetch(mdPath)
       .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.text(); })
       .then(function(text) {
-        panel.innerHTML = '<div class="article-body" style="max-width:780px;margin:0 auto;padding:24px;">' + simpleMarkdown(text) + '</div>';
+        var eqs = [];
+        text = text.replace(/\$\$([\s\S]*?)\$\$/g, function(m, eq) { eqs.push(eq); return '<div class="m-eq" data-i="'+(eqs.length-1)+'"></div>'; });
+        var html = marked.parse(text);
+        html = html.replace(/<div class="m-eq" data-i="(\d+)"><\/div>/g, function(m, i) { return '<div class="math-block">$$\n'+eqs[i]+'\n$$</div>'; });
+        panel.innerHTML = '<div class="article-body" style="max-width:780px;margin:0 auto;padding:24px;">' + html + '</div>';
         if (window.renderMathInElement) {
           renderMathInElement(panel, {delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});
         }
+        if (window.hljs) hljs.highlightAll();
         setTimeout(buildTOC, 100);
       })
       .catch(function() {
@@ -1551,13 +1625,13 @@
 
 
   
-  // === TOC (目录) ===
+  // ==================== 目录（Table of Contents） ====================
   var tocVisible = false;
 
   function buildTOC() {
     var panel = document.querySelector('.panel.active');
     if (!panel) return;
-    var headings = panel.querySelectorAll('h2, h3');
+    var headings = panel.querySelectorAll('h1, h2, h3');
     var container = document.getElementById('tocBody');
     if (!container) return;
     if (headings.length === 0) {
@@ -1625,7 +1699,11 @@
 </script>
 
 
-<!-- ================= 猫猫弹窗 ================= -->
+<!-- ================= 猫猫打赏弹窗 =================
+  点击侧边栏底部猫猫触发
+  role="dialog" + aria-modal 确保无障碍
+  body 内猫猫图片 → 点击「打赏」→ canvas 二维码
+============================================== -->
 <div class="cat-modal-overlay" id="catModalOverlay" role="dialog" aria-modal="true" aria-labelledby="catModalTitle" aria-hidden="true">
   <div class="cat-modal">
     <button class="cat-modal-close" id="catModalClose" aria-label="关闭弹窗">&times;</button>
@@ -1744,61 +1822,4 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
