@@ -1286,16 +1286,15 @@
       <nav class="tree">
         <div class="root-label"><span class="chev">▾</span> blog/</div>
         <div class="folder open">
-          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> ▸📁 控制理论</button>
+          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 控制理论</button>
           <ul class="files">
-            <li><a href="#" data-md="source/document/数学模型.md" data-folder="▸📁 控制理论" data-file="数学模型" data-category="技术"><span class="file-dot">🔧</span>数学模型</a></li>
-            <li><a href="#" data-md="source/document/theory.md" data-folder="▸📁 控制理论" data-file="时域分析" data-category="技术"><span class="file-dot">🔧</span>时域分析</a></li>
+            <li><a href="#" data-md="source/document/数学模型.md" data-folder="控制理论" data-file="数学模型" data-category="技术"><span class="file-dot">🔧</span>数学模型</a></li>
+            <li><a href="#" data-md="source/document/theory.md" data-folder="控制理论" data-file="时域分析" data-category="技术"><span class="file-dot">🔧</span>时域分析</a></li>
           </ul>
         </div>
         <div class="folder open">
-          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> ▸📁 个人想法</button>
+          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 个人想法</button>
           <ul class="files">
-            <li><a href="#" data-md="" data-folder="▸📁 个人想法" data-file="新文章" data-category="其他"><span class="file-dot">·</span>新文章</a></li>
           </ul>
         </div>
         <a href="game/index.html" class="sidebar-game-link">
@@ -1516,7 +1515,7 @@
 
   function openDoc(mdPath, title, folder, category) {
     // Map category to icon
-        var catIcon = '○';
+                                                            var catIcon = '○';
     if (category === '技术') catIcon = '🔧';
     else if (category === '理论') catIcon = '📘';
     else if (category === '想法') catIcon = '💡';

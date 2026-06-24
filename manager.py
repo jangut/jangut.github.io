@@ -1,5 +1,8 @@
 import http.server, json, os, re, sys, urllib.parse, html as hm
-BASE = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, 'frozen', False):
+    BASE = sys._MEIPASS
+else:
+    BASE = os.path.dirname(os.path.abspath(__file__))
 DOCS = os.path.join(BASE, "source", "document")
 HTML_PATH = os.path.join(BASE, "index.html")
 PORT = int(os.environ.get("PORT", "8080"))
@@ -37,7 +40,7 @@ def parse_tree():
     for fm in fpat.finditer(nav_cont):
         is_open = bool(fm.group(1) and "open" in fm.group(1))
         name = re.sub(r"<[^>]+>","",fm.group(2)).strip()
-        name = re.sub(r"^ *\U0001f4c1 *","",name).strip()
+        name = re.sub(r"^[ \U0001f4c1\u25b8]+","",name).strip()
         files = []
         ipat = re.compile(r'<li><a\s+href="#"\s+data-md="(.*?)"\s+data-folder="(.*?)"\s+data-file="(.*?)"\s+data-category="(.*?)">',re.DOTALL)
         for fi in ipat.finditer(fm.group(3)):
@@ -52,7 +55,12 @@ def _parse_tags_from_js(html):
     pat = re.compile(r"category\s*===\s*'([^']+)'\)\s*catIcon\s*=\s*'([^']*)'")
     for m in pat.finditer(html):
         tags.append({"name":m.group(1),"icon":m.group(2) or "\u00b7"})
-    return tags if tags else default_tags()
+    if not tags: return default_tags()
+    seen = {t["name"] for t in tags}
+    for d in default_tags():
+        if d["name"] not in seen:
+            tags.append(d)
+    return tags
 
 def invalidate_cache():
     global _tree_cache; _tree_cache = None
@@ -177,5 +185,11 @@ class H(http.server.BaseHTTPRequestHandler):
 if __name__ == "__main__":
     srv = http.server.HTTPServer(("0.0.0.0",PORT),H)
     print("Blog Manager running at http://localhost:%d" % PORT)
+    url = 'http://localhost:%d' % PORT
+    try:
+        import webbrowser
+        webbrowser.open(url)
+    except:
+        pass
     try: srv.serve_forever()
     except KeyboardInterrupt: print("\nstopped"); srv.server_close()
