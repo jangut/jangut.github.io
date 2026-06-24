@@ -1285,39 +1285,24 @@
 
       <nav class="tree">
         <div class="root-label"><span class="chev">▾</span> blog/</div>
-
         <div class="folder open">
-          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 控制理论</button>
+          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> ▸📁 控制理论</button>
           <ul class="files">
-            <li><a href="#" data-md="source/document/数学模型.md" data-folder="控制理论" data-file="数学模型" data-category="技术"><span class="file-dot">🔧</span>数学模型</a></li>
-            <li><a href="#" data-md="source/document/theory.md" data-folder="控制理论" data-file="控制理论入门" data-category="理论"><span class="file-dot">📘</span>控制理论入门</a></li>
-            <li><a href="#" data-category="理论"><span class="file-dot">📘</span>文章标题三</a></li>
+            <li><a href="#" data-md="source/document/数学模型.md" data-folder="▸📁 控制理论" data-file="数学模型" data-category="技术"><span class="file-dot">🔧</span>数学模型</a></li>
+            <li><a href="#" data-md="source/document/theory.md" data-folder="▸📁 控制理论" data-file="时域分析" data-category="技术"><span class="file-dot">🔧</span>时域分析</a></li>
           </ul>
         </div>
-
-        <div class="folder">
-          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 分类二</button>
+        <div class="folder open">
+          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> ▸📁 个人想法</button>
           <ul class="files">
-            <li><a href="#"><span class="file-dot">·</span>文章标题四</a></li>
-            <li><a href="#"><span class="file-dot">·</span>文章标题五</a></li>
+            <li><a href="#" data-md="" data-folder="▸📁 个人想法" data-file="新文章" data-category="其他"><span class="file-dot">·</span>新文章</a></li>
           </ul>
         </div>
-
-        <div class="folder">
-          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 分类三</button>
-          <ul class="files">
-            <li><a href="#"><span class="file-dot">·</span>文章标题六</a></li>
-          </ul>
-        </div>
-
-        
-        <div class="folder">
- 
-<a href="game/index.html" class="sidebar-game-link">
+        <a href="game/index.html" class="sidebar-game-link">
           <span style="width:20px;text-align:center">🎮</span>
           游戏盒子
         </a>
-      </nav>
+</nav>
 
       <div class="sidebar-footer">
         <div class="label">给猫金币，顺心顺意</div>
@@ -1531,11 +1516,11 @@
 
   function openDoc(mdPath, title, folder, category) {
     // Map category to icon
-    var catIcon = '○';
+        var catIcon = '○';
     if (category === '技术') catIcon = '🔧';
-    else if (category === '想法') catIcon = '💡';
     else if (category === '理论') catIcon = '📘';
-    // Check if already open
+    else if (category === '想法') catIcon = '💡';
+    else if (category === '其他') catIcon = '·';// Check if already open
     var existing = document.querySelector('[data-md-panel="' + mdPath.replace(/"/g,'') + '"]');
     if (existing) {
       switchToPanel(existing.dataset.panel);

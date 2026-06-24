@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Blog Manager</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:#0a0e14;color:#f0f4f8;display:flex;height:100vh}
-.sidebar{width:280px;background:#0f141d;border-right:1px solid #232d3b;overflow-y:auto;padding:12px;flex-shrink:0}
+.sidebar{width:360px;background:#0f141d;border-right:1px solid #232d3b;overflow-y:auto;padding:12px;flex-shrink:0}
 .sidebar h2{font-size:13px;color:#667084;margin-bottom:10px;letter-spacing:.1em}
 .doc-list{font-size:13px}
 .doc-item{padding:6px 10px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s}
@@ -27,16 +27,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .fh{padding:10px 14px;display:flex;align-items:center;gap:8px;cursor:pointer}
 .fh .ch{transition:transform .2s;color:#4cf7ff;font-size:10px}
 .fh .ch.o{transform:rotate(90deg)}
-.fh inp{border:none;background:transparent;color:#f0f4f8;flex:1;font-size:14px;outline:none}
-.fh inp:focus{outline:1px solid #4cf7ff;border-radius:3px;padding:2px 4px}
+.fh input{border:none;background:transparent;color:#f0f4f8;flex:1;font-size:14px;outline:none}
+.fh input:focus{outline:1px solid #4cf7ff;border-radius:3px;padding:2px 4px}
 .fb{padding:0 14px 10px 30px;display:none}
 .fb.o{display:block}
 .fl{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:13px;border-bottom:1px solid #1a2535}
+.tr{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:13px;border-bottom:1px solid #1a2535}
+.tn{flex:1;border:none;background:transparent;color:#9db0c3;font-size:13px;outline:none}
+.tn:focus{outline:1px solid #4cf7ff;border-radius:3px;padding:1px 4px;color:#f0f4f8}
+.ti{flex:0 0 40px;border:none;background:transparent;color:#9db0c3;font-size:13px;outline:none;text-align:center}
+.ti:focus{outline:1px solid #4cf7ff;border-radius:3px;color:#f0f4f8}
+.tr .dx{color:#ff6b6b;cursor:pointer;opacity:.4;flex-shrink:0;padding:2px 4px}
+.tr .dx:hover{opacity:1}
 .fl:last-child{border:none}
-.fl inp{flex:1;border:none;background:transparent;color:#9db0c3;font-size:13px;outline:none}
-.fl inp:focus{outline:1px solid #4cf7ff;border-radius:3px;color:#f0f4f8}
-.fl sel{padding:2px 6px;border-radius:3px;border:1px solid #232d3b;background:#0f141d;color:#9db0c3;font-size:11px;cursor:pointer}
-.fl .dx{color:#ff6b6b;cursor:pointer;opacity:.4}
+.fl input{flex:1;border:none;background:transparent;color:#9db0c3;font-size:13px;outline:none}
+.fl input:focus{outline:1px solid #4cf7ff;border-radius:3px;color:#f0f4f8}
+.fl select{padding:2px 6px;border-radius:3px;border:1px solid #232d3b;background:#0f141d;color:#9db0c3;font-size:11px;cursor:pointer}
+.fl .dx{color:#ff6b6b;cursor:pointer;opacity:.4;flex-shrink:0}
 .fl .dx:hover{opacity:1}
 .ft textarea{width:100%;padding:10px;border:1px solid #232d3b;border-radius:8px;background:#0f141d;color:#9db0c3;font-size:13px;min-height:50px;resize:vertical}
 .ft textarea:focus{outline:1px solid #4cf7ff}
@@ -44,42 +51,119 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .imp.o{display:block}
 .ii{padding:6px 12px;display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;border-bottom:1px solid #1a2535}
 .ii:hover{background:#1a2535}
+.tree-tbar{display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid #232d3b}
+.lib-wrap{border-top:1px solid #232d3b;margin-top:4px}
+.lib-h{cursor:pointer;font-size:13px;color:#667084;display:flex;align-items:center;gap:6px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.lib-h:hover{color:#9db0c3}
+.lib-cv{transition:transform .2s;font-size:8px}
+.lib-cv.o{transform:rotate(180deg)}
+.lib-body{padding:0 10px 8px;display:none}
+.lib-body.o{display:block}
+.lib-item{padding:5px 0;cursor:pointer;font-size:13px;color:#9db0c3;border-bottom:1px solid #1a2535}
+.lib-item:hover{color:#f0f4f8}
+.lib-item .tag{font-size:10px;padding:0 5px;border-radius:3px;margin-left:6px}
 .ts{position:fixed;bottom:20px;right:20px;padding:10px 20px;border-radius:8px;background:#16a34a;color:#fff;font-size:13px;opacity:0;transition:opacity .3s;z-index:999}
 .ts.s{opacity:1}
+.pv{flex:1;overflow-y:auto;padding:20px;border-left:1px solid #232d3b;display:none;flex-direction:column}
+.pv.o{display:flex}
+.ph{color:#667084;font-size:13px;padding:8px 0;border-bottom:1px solid #232d3b;margin-bottom:12px}
+.pb{background:#0f141d;border:1px solid #232d3b;border-radius:8px;padding:16px;font-family:monospace;font-size:13px;color:#9db0c3;white-space:pre-wrap;word-break:break-word;overflow-x:auto;flex:1;line-height:1.6;margin:0}
+.tag-row{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1a2535}
+.tag-row input{flex:1;border:none;background:transparent;color:#9db0c3;font-size:13px;outline:none}
+.tag-row input:focus{outline:1px solid #4cf7ff;border-radius:3px;color:#f0f4f8}
+.tag-row .del{color:#ff6b6b;cursor:pointer;opacity:.4;padding:2px 4px}
+.tag-row .del:hover{opacity:1}
 </style></head>
 <body>
-<div class="sidebar"><h2>📂 文件列表</h2><div class="doc-list" id="dl"></div></div>
+<div class="sidebar" style="overflow-y:auto">
+  <div class="tree-tbar">
+    <span style="flex:1"></span>
+    <button class="btn btn-p" style="font-size:11px;padding:3px 10px;margin:0 2px" onclick="af()" title="新建文件夹">+</button>
+    <button class="btn btn-p" style="font-size:11px;padding:3px 10px;margin:0" onclick="sv()" title="保存">💾</button>
+  </div>
+  <div class="doc-list" id="dl" style="font-size:12px"></div>
+  <div class="lib-wrap">
+    <div class="lib-h" onclick="this.nextElementSibling.classList.toggle('o');this.querySelector('.lib-cv').classList.toggle('o')">
+      <span class="lib-cv o">▼</span> 📚 文件库
+    </div>
+    <div class="lib-body o" id="libList"></div>
+  </div>
+  <div class="sec"><h3>标签 & 图标</h3><div id="tagList"></div><button class="btn btn-p" style="font-size:11px;padding:4px 10px;margin-top:4px" onclick="addTag()">+ 添加标签</button></div>
+  <div class="sec"><div class="imp" id="il"></div></div>
+</div>
 <div class="main">
-<div class="tbar"><button onclick="af()">+ 新建文件夹</button><button onclick="si()">📥 导入</button><span style="flex:1"></span><button class="btn-p btn" onclick="sv()">💾 保存</button></div>
-<div class="cnt">
-<div class="sec" id="ts"></div>
-<div class="sec ft"><h3>底部文案</h3><textarea id="li" placeholder="给猫金币，顺心顺意"></textarea></div>
-<div class="sec"><div class="imp" id="il"></div></div>
-</div></div>
+  <div class="tbar"><button onclick="si()">📥 导入</button><button onclick="var e=document.getElementById('fi');e.click()">📂 打开 .md</button><input type="file" id="fi" accept=".md" style="display:none" onchange="openMd(this)">
+  </div>
+  <div class="pv" id="pv" style="flex:1;overflow-y:auto;padding:20px">
+    <div class="ph" id="ph" style="color:#667084;font-size:13px;padding-bottom:8px;border-bottom:1px solid #232d3b;margin-bottom:12px">点击文件预览</div>
+    <pre class="pb" id="pb" style="background:#0f141d;border:1px solid #232d3b;border-radius:8px;padding:16px;font-family:monospace;font-size:13px;color:#9db0c3;white-space:pre-wrap;word-break:break-word;line-height:1.6;margin:0;min-height:200px"></pre>
+  </div>
+</div>
 <div class="ts" id="tst"></div>
 <script>
 var T;
-function ld(){fetch('/api/tree').then(function(r){return r.json()}).then(function(d){T=d;R()})}
+function ld(){fetch("/api/tree").then(function(r){return r.json()}).then(function(d){T=d;R()})}
 function es(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function R(){
   var h='<h3>📁 文件树</h3>';
   T.folders.forEach(function(f,i){
-    h+='<div class="fld"><div class="fh" onclick="T.folders['+i+'].open=!T.folders['+i+'].open;R()">';
-    h+='<span class="ch'+(f.open?' o':'')+'">▸</span>';
-    h+='<inp value="'+es(f.name)+'" onchange="T.folders['+i+'].name=this.value"></inp>';
-    h+='<span style="margin-left:auto;color:#667084;font-size:11px">'+f.files.length+'</span></div>';
+    h+='<div class="fld"><div class="fh">';
+    h+='<span class="ch'+(f.open?' o':'')+'" onclick="T.folders['+i+'].open=!T.folders['+i+'].open;R()">▸</span>';
+    h+='<input value="'+es(f.name)+'" onchange="T.folders['+i+'].name=this.value">';
+    h+='<span class="dx" onclick="T.folders.splice('+i+',1);R()">✕</span>';
+      h+='<span style="color:#667084;font-size:11px">'+f.files.length+'</span></div>';
     h+='<div class="fb'+(f.open?' o':'')+'">';
     f.files.forEach(function(g,j){
-      h+='<div class="fl"><inp value="'+es(g.title)+'" onchange="T.folders['+i+'].files['+j+'].title=this.value"></inp>';
-      h+='<sel onchange="T.folders['+i+'].files['+j+'].cat=this.value">';
+      h+='<div class="fl" data-path="'+es(g.path)+'" data-title="'+es(g.title)+'"><input value="'+es(g.title)+'" onchange="T.folders['+i+'].files['+j+'].title=this.value">';
+      h+='<select onchange="T.folders['+i+'].files['+j+'].cat=this.value">';
       ['技术','理论','其他'].forEach(function(c){h+='<option'+(g.cat===c?' selected':'')+'>'+c+'</option>'});
-      h+='</sel><span class="dx" onclick="T.folders['+i+'].files.splice('+j+',1);R()">✕</span></div>';
+      h+='</select><span class="dx" onclick="T.folders['+i+'].files.splice('+j+',1);R()">✕</span></div>';
     });
     h+='<div style="margin-top:6px"><button class="btn btn-p" style="font-size:11px;padding:4px 10px" onclick="T.folders['+i+'].files.push({path:\'\',title:\'新文章\',cat:\'其他\'});R()">+ 添加</button></div></div></div>';
   });
   h+='<div style="margin-top:8px"><button class="btn btn-p" onclick="af()">+ 新建文件夹</button></div>';
-  document.getElementById('ts').innerHTML=h;
+  document.getElementById('dl').innerHTML=h;
+  renderLibrary();
+  renderTags();
   if(T.label) document.getElementById('li').value=T.label;
+}
+function renderTags(){
+  var e=document.getElementById('tagList');
+  if(!e)return;
+  if(!T.tags)T.tags=[
+    {name:'技术',icon:'🔧'},
+    {name:'理论',icon:'📘'},
+    {name:'想法',icon:'💡'},
+    {name:'其他',icon:'·'}
+  ];
+  var h='';
+  T.tags.forEach(function(t,j){
+    h+='<div class="tr">';
+    h+='<input class="tn" value="'+t.name+'" onchange="T.tags['+j+'].name=this.value;R()" placeholder="名称">';
+    h+='<input class="ti" value="'+t.icon+'" onchange="T.tags['+j+'].icon=this.value;R()" placeholder="图标">';
+    h+='<span class="dx" onclick="T.tags.splice('+j+',1);renderTags();R()">✕</span>';
+    h+='</div>';
+  });
+  e.innerHTML=h;
+}
+function addTag(){
+  if(!T.tags)T.tags=[];
+  T.tags.push({name:'新标签',icon:'📌'});
+  renderTags();R();
+}
+function renderLibrary(){
+  var el=document.getElementById('libList');
+  if(!el)return;
+  fetch('/api/docs').then(function(r){return r.json()}).then(function(d){
+    var h='';
+    d.forEach(function(x){
+      h+='<div class="lib-item" data-path="'+x.path+'" data-title="'+x.title+'">';
+      h+='<span class="tag '+(x.cat==='技术'?'t':x.cat==='理论'?'l':x.cat==='想法'?'i':'o')+'">'+x.cat+'</span>';
+      h+=x.title+'</div>';
+    });
+    if(!d.length)h='<div style="padding:8px;color:#667084;font-size:11px">没有文件</div>';
+    el.innerHTML=h;
+  });
 }
 function af(){T.folders.push({name:'新分类',open:true,files:[]});R()}
 function si(){
@@ -102,5 +186,67 @@ function sv(){
   fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(T)}).then(function(r){return r.json()}).then(function(d){if(d.ok)ts('已保存')});
 }
 function ts(m){var e=document.getElementById('tst');e.textContent=m;e.classList.add('s');setTimeout(function(){e.classList.remove('s')},2000)}
-ld();
-</script></body></html>
+
+function openMd(i) {
+  var file=i.files[0];if(!file)return;
+  var name=file.name, ext=name.split('.').pop();
+  var r=new FileReader();
+  r.onload=function(e){
+    var t=e.target.result, title=name.replace('.'+ext,''), cat='其他';
+    if(ext==='md'){
+      var m=t.match(/^---\n([\s\S]*?)\n---/);
+      if(m){
+        var tv=m[1].match(/^title\s*:\s*(.+)$/m);
+        var cv=m[1].match(/^category\s*:\s*(.+)$/m);
+        if(tv)title=tv[1].trim();if(cv)cat=cv[1].trim();
+      }
+    }
+    document.getElementById('pv').classList.add('o');
+    document.getElementById('pb').textContent=t;
+    // Upload to server then add to tree
+    fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,content:t})})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.ok&&typeof T!=='undefined'&&T){
+        var folder=T.folders[0];
+        if(!folder){T.folders.push({name:'导入',open:true,files:[]});folder=T.folders[0];}
+        folder.files.push({path:d.path,title:title,cat:cat});
+        R();renderLibrary();
+        ts('已上传『'+title+'』');
+      }
+    }).catch(function(){ts('上传失败');});
+  };
+  r.readAsText(file);
+  i.value='';
+}
+
+
+
+
+
+function preview(path,title){
+  if(!path||path.startsWith('<local>')){ts('本地文件无法服务器预览');return;}
+  var e=document.getElementById('pv');e.classList.add('o');
+  document.getElementById('pb').textContent='Loading...';
+  document.getElementById('ph').textContent=title||path;
+  fetch('/api/read/'+encodeURIComponent(path)).then(function(r){return r.json()}).then(function(d){
+    document.getElementById('pb').textContent=d.content||'(empty)';
+  }).catch(function(){document.getElementById('pb').textContent='Error loading file';});
+}
+
+// Override R to add preview click + tag rendering
+// Event delegation for preview
+(function(){
+  var dl=document.getElementById('dl'),ll=document.getElementById('libList');
+  function pv(el){if(el.dataset.path)preview(el.dataset.path,el.dataset.title);}
+  dl&&dl.addEventListener('click',function(e){
+    var fl=e.target.closest('.fl');
+    if(!fl||e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.classList.contains('dx'))return;
+    pv(fl);
+  });
+  ll&&ll.addEventListener('click',function(e){
+    var li=e.target.closest('.lib-item');if(!li)return;pv(li);
+  });
+})();</script>
+</body>
+</html>
+
