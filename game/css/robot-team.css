@@ -1,0 +1,122 @@
+﻿
+    /* ── 重置 ── */
+    *{margin:0;padding:0;box-sizing:border-box}
+
+    /* ── 全屏居中布局 ── */
+    body{
+      background:#111 url("images/rob_background.png") center/cover no-repeat fixed;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* ── 显示屏 ── */
+    .screen{
+      position:relative;
+      background:#0a0a0a;
+      border:5px solid #555;
+      border-radius:6px;
+      padding:45px 65px 40px;
+      box-shadow:
+        inset 0 0 50px rgba(0,255,170,0.05),
+        0 8px 0 #222,
+        0 0 40px rgba(0,0,0,0.9);
+    }
+
+    /* ── 扫描线 ── */
+    .screen::after{
+      content:"";
+      position:absolute;
+      inset:3px;
+      background:url("images/texture_LED.webp") center/cover no-repeat;
+      opacity:0.3;
+      pointer-events:none;
+      border-radius:3px;
+    }
+
+    /* ── 电源指示灯 ── */
+    .screen::before{
+      content:"";
+      position:absolute;
+      bottom:12px;
+      right:20px;
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:#0f0;
+      box-shadow:0 0 6px #0f0;
+      animation:ledPulse 2s ease-in-out infinite;
+    }
+
+    /* ── 标题 ── */
+    .title-img{
+      display:block;
+      margin:0 auto 32px;
+      image-rendering:pixelated;
+      width:320px;
+      height:auto;
+      animation:titleFlicker 3s steps(1) infinite;
+    }
+    /* ── 标题闪烁（仅透明度） ── */
+    @keyframes titleFlicker{
+      0%,100%{opacity:1}
+      2%{opacity:0.6}
+      4%{opacity:1}
+      18%{opacity:0.85}
+      20%{opacity:1}
+      43%{opacity:0.7}
+      44%{opacity:0.9}
+      46%{opacity:1}
+      68%{opacity:0.9}
+      70%{opacity:1}
+      87%{opacity:0.5}
+      88%{opacity:1}
+      95%{opacity:0.8}
+      97%{opacity:1}
+    }
+
+    @keyframes ledPulse{
+      0%,100%{opacity:1}
+      50%{opacity:0.4}
+    }
+
+    /* ── 按钮闪烁（仅透明度，节奏不同） ── */
+    @keyframes btnFlicker{
+      0%,100%{opacity:1}
+      5%{opacity:0.75}
+      7%{opacity:1}
+      22%{opacity:0.85}
+      24%{opacity:1}
+      37%{opacity:0.6}
+      38%{opacity:0.9}
+      40%{opacity:1}
+      61%{opacity:0.8}
+      63%{opacity:1}
+      82%{opacity:0.55}
+      83%{opacity:0.95}
+      85%{opacity:1}
+      93%{opacity:0.7}
+      95%{opacity:1}
+    }
+
+    /* ── 菜单图片按钮 ── */
+    .menu{text-align:center}
+    .menu img{
+      display:block;
+      margin:0 auto 16px;
+      cursor:pointer;
+      /* 像素字体图片需禁用平滑缩放，保持锯齿边缘 */
+      image-rendering:pixelated;
+      transition:opacity 0.2s,transform 0.2s;
+      animation:btnFlicker 4s steps(1) infinite;
+    }
+    .menu img:hover{
+      opacity:0.8 !important;
+      transform:translateY(-2px);
+    }
+    .menu img:active{
+      transform:scale(0.95);
+      opacity:1 !important;
+    }
+  

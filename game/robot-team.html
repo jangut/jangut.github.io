@@ -1,0 +1,44 @@
+﻿<!--
+  robot-team.html
+  ──────────────
+  机器人变换 · 开始界面
+  主菜单入口页面，负责展示游戏标题与三个功能入口。
+
+  依赖:
+    - images/title_transform.png  — 标题（Cubic 11 像素字，字号比按钮大一号）
+
+  后续扩展:
+    - 将 onclick 回调替换为实际游戏逻辑入口
+    - 可在 .menu 内追加更多菜单项（关卡选择、成就等）
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>机器人小队</title>
+  <!-- Cubic 11 像素字体后备（首选方案为预渲染图片） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cubic+11&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/robot-team.css">
+</head>
+<body>
+
+  <!-- ═══ 主菜单 ═══ -->
+  <div class="screen">
+    <!-- 标题图片（Cubic 11 预渲染，字号比按钮大一号，保存为 images/title_transform.png） -->
+    <img class="title-img" src="images/title_transform.png" alt="机器人变换">
+    <div class="menu">
+    <img src="images/menu_start.png"    alt="开始游戏" onclick="onStartGame()">
+    <img src="images/menu_settings.png" alt="设置"     onclick="onSettings()">
+    <img src="images/menu_help.png"     alt="帮助"     onclick="onHelp()">
+  </div>
+  </div>
+
+  <script src="js/menu.js"></script>
+  <script src="js/robot.js"></script>
+</body>
+</html>
