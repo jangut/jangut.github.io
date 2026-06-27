@@ -18,9 +18,7 @@
 <link rel="prefetch" as="audio" href="source/music/victory.mp3" type="audio/mpeg">
 <link rel="prefetch" as="video" href="source/video/fail.mp4" type="video/mp4">
 <link rel="prefetch" as="video" href="source/video/victory.mp4" type="video/mp4">
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-void: #f5f7fa;
@@ -40,7 +38,7 @@
       --line: #e2e8f0;
       --line-soft: #eaeef2;
       --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-      --sans: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
       --serif: 'Noto Serif SC', "Songti SC", serif;
     }
     @media (prefers-color-scheme: dark) {
@@ -73,8 +71,7 @@
     color: var(--text-primary);
     font-family: var(--sans);
     line-height: 1.6;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     background-image:
       radial-gradient(circle at 85% 0%, rgba(14,165,233,0.08), transparent 40%),
       radial-gradient(circle at 0% 85%, rgba(217,119,6,0.06), transparent 40%),
@@ -121,7 +118,7 @@
   .window{
     max-width: 1440px;
     margin: 0 auto;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     border-left: 1px solid var(--line-soft);
@@ -168,12 +165,10 @@
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 28px;
-    height: 10vh;
-    min-height: 60px;
-    max-height: 120px;
-    background: linear-gradient(90deg, transparent, rgba(14,165,233,0.20));
-    border: 1px solid rgba(14,165,233,0.25);
+    width: 24px;
+    height: 48px;
+    background: linear-gradient(90deg, transparent, rgba(14,165,233,0.08));
+    border: 1px solid rgba(14,165,233,0.15);
     border-left: none;
     border-radius: 0 8px 8px 0;
     color: var(--text-muted);
@@ -190,21 +185,11 @@
     border-color: rgba(14,165,233,0.3);
     color: var(--accent-cyan);
   }
-  .peek-label{
-    font-size: inherit;
-    line-height: 1.3;
-    text-align: center;
-    display: block;
-  }
-  .toc-label{
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    letter-spacing: 2px;
-  }
+  .sidebar-peek svg{ width: 14px; height: 14px; }
   @media (prefers-color-scheme: dark) {
     .sidebar-peek{
-      background: linear-gradient(90deg, transparent, rgba(76,247,255,0.18));
-      border-color: rgba(76,247,255,0.20);
+      background: linear-gradient(90deg, transparent, rgba(76,247,255,0.08));
+      border-color: rgba(35,45,59,0.4);
     }
     .sidebar-peek:hover{
       background: linear-gradient(90deg, transparent, rgba(76,247,255,0.15));
@@ -215,17 +200,15 @@
   /* ============ LAYOUT ============ */
   .app{
     flex: 1;
-    display: flex;
+    display: grid;
+    grid-template-columns: 268px 1fr;
     min-height: 0;
   }
 
   /* ============ SIDEBAR / EXPLORER ============ */
   .sidebar{
-    width: 268px;
-    flex-shrink: 0;
-    overflow: hidden;
-    background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(240,244,249,0.88));
-    border-right: 1px solid rgba(14,165,233,0.15);
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(240,244,249,0.4));
+    border-right: 1px solid rgba(14,165,233,0.12);
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -233,7 +216,7 @@
   }
   @media (prefers-color-scheme: dark) {
     .sidebar{
-      background: linear-gradient(180deg, rgba(15,20,29,0.92), rgba(21,29,40,0.88));
+      background: linear-gradient(180deg, rgba(15,20,29,0.6), rgba(21,29,40,0.4));
       border-right-color: rgba(35,45,59,0.5);
     }
   }
@@ -324,38 +307,6 @@
     }
   }
   .folder-icon{ color: var(--accent-amber); opacity: 0.9; flex-shrink: 0; font-size: 14px; }
-  /* --- 游戏链接 --- */
-  .sidebar-game-link{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 10px 12px;
-    margin-top: 8px;
-    border-radius: 8px;
-    color: var(--text-secondary);
-    font-size: 13px;
-    transition: all 0.2s ease;
-    background: linear-gradient(135deg, rgba(217,119,6,0.06), rgba(236,72,153,0.06));
-    border: 1px solid rgba(217,119,6,0.1);
-  }
-  .sidebar-game-link:hover{
-    color: var(--text-primary);
-    background: linear-gradient(135deg, rgba(217,119,6,0.12), rgba(236,72,153,0.12));
-    border-color: rgba(217,119,6,0.25);
-    transform: scale(1.04);
-  }
-  @media (prefers-color-scheme: dark) {
-    .sidebar-game-link{
-      background: linear-gradient(135deg, rgba(255,184,77,0.06), rgba(255,148,232,0.06));
-      border-color: rgba(255,184,77,0.08);
-    }
-    .sidebar-game-link:hover{
-      background: linear-gradient(135deg, rgba(255,184,77,0.12), rgba(255,148,232,0.12));
-      border-color: rgba(255,184,77,0.2);
-    }
-  }
-
 
   .files{
     list-style: none;
@@ -406,19 +357,10 @@
       background: rgba(76,247,255,0.12);
     }
   }
- .file-dot{ color: var(--text-muted); flex-shrink: 0; }
- .files li a.active .file-dot{ color: var(--accent-cyan); }
+  .file-dot{ color: var(--text-muted); flex-shrink: 0; }
+  .files li a.active .file-dot{ color: var(--accent-cyan); }
 
-  /* --- Peek 按钮自动透明 --- */
-  .toc-peek:not(.hidden), .sidebar-peek{
-    opacity: 0.75;
-    transition: opacity 0.35s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
-  }
-  .toc-peek:not(.hidden):hover, .sidebar-peek:hover{
-    opacity: 1;
-  }
-
- .sidebar-footer{
+  .sidebar-footer{
     border-top: 1px solid rgba(14,165,233,0.1);
     padding: 16px 18px 18px;
     background: linear-gradient(180deg, transparent, rgba(14,165,233,0.05));
@@ -431,13 +373,12 @@
     }
   }
   .sidebar-footer .label{
-    font-family: var(--sans);
-    font-size: larger;
-    font-weight: bold;
-    letter-spacing: 0.04em;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
     color: var(--text-muted);
-    margin-bottom: 4px;
-    text-align: center;
+    margin-bottom: 10px;
+    text-transform: uppercase;
   }
   .couplet{
     font-family: var(--serif);
@@ -445,173 +386,18 @@
     color: var(--text-secondary);
     line-height: 1.9;
   }
- .couplet .gold{ color: var(--accent-amber); }
-
-  /* --- 猫猫装饰 --- */
-  .sidebar-footer .cat-wrap{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0 6px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-  }
-  .sidebar-footer .cat-wrap:hover{
-    transform: scale(1.08);
-  }
-  .sidebar-footer .cat-wrap img{
-    width: 100%;
-    max-width: 140px;
-    height: auto;
-    opacity: 0.75;
-    transition: opacity 0.4s ease;
-  }
-  .sidebar-footer .cat-wrap:hover img{
-    opacity: 0.85;
-  }
-
-  /* --- 捐献文案 --- */
-  .donate-text{
-    font-size: 12px;
-    text-align: center;
-    color: var(--text-muted);
-    line-height: 1.5;
-    padding: 6px 0 2px;
-  }
-  .donate-btn{
-    font-family: var(--sans);
-    font-size: 14px;
-    padding: 8px 20px;
-    border-radius: 8px;
-    border: 1px solid var(--accent-amber);
-    background: var(--accent-amber-dim);
-    color: var(--accent-amber);
-    cursor: pointer;
-    margin: 8px 0;
-    transition: all 0.2s ease;
-  }
-  .donate-btn:hover{
-    background: rgba(217,119,6,0.2);
-    transform: scale(1.03);
-  }
-  /* --- 粒子 & 弹入 --- */
-  /* 二维码缩放弹入 */
-@keyframes popIn{
-    from{ transform: scale(0); opacity: 0; }
-    to{ transform: scale(1); opacity: 1; }
-  }
-  .particle{
-    position: fixed;
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--accent-amber);
-    pointer-events: none;
-    z-index: 1000;
-    transition: all 0.7s ease-out;
-  }
-
-  .cat-closing{
-    font-size: smaller;
-    opacity: 0.5;
-    margin-top: 8px;
-  }
-
-  /*
-  猫猫弹窗（打赏 / 展示二维码）
-  - overlay 占满全屏，毛玻璃背景
-  - .open 类控制显示/隐藏
-  - 弹入动画 catPopin
-  - 打赏按钮触发粒子特效 + 二维码 canvas 渲染
-*/
-  .cat-modal-overlay{
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(4px);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-  }
-  .cat-modal-overlay.open{ display: flex; }
-  /* 弹窗入场：缩放 + 上弹 */
-@keyframes catPopin{
-    from{ opacity:0; transform:scale(0.85) translateY(12px); }
-    to{ opacity:1; transform:scale(1) translateY(0); }
-  }
-  .cat-modal{
-    background: var(--bg-panel);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    max-width: 440px;
-    width: 90%;
-    padding: 32px;
-    position: relative;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.2);
-    animation: catPopin 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .cat-modal-close{
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: var(--text-muted);
-    cursor: pointer;
-    line-height: 1;
-    padding: 4px;
-  }
-  .cat-modal-close:hover{ color: var(--text-primary); }
-  .cat-modal-body{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-  .cat-modal-img{
-    width: 120px;
-    height: auto;
-    opacity: 0.85;
-  }
-  .cat-modal-text{
-    text-align: center;
-    line-height: 1.7;
-  }
-  .cat-modal-text h3{
-    font-family: var(--serif);
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: var(--accent-amber);
-  }
-  .cat-modal-text p{
-    color: var(--text-secondary);
-    font-size: 14.5px;
-    margin-bottom: 4px;
-  }
+  .couplet .gold{ color: var(--accent-amber); }
 
   /* ============ MAIN / EDITOR ============ */
-  .main-view{
+  .editor{
     display: flex;
     flex-direction: column;
-    flex: 1;
     min-height: 0;
     min-width: 0;
   }
 
-  .content-wrapper{
-    flex: 1;
-    overflow-y: auto;
-    background: var(--bg-void);
-    display: flex;
-    justify-content: center;
-    position: relative;
-    min-height: 0;
-  }
-
   .tabbar{
     display: flex;
-    flex-shrink: 0;
     background: var(--bg-panel);
     border-bottom: 1px solid var(--line);
     font-family: var(--mono);
@@ -622,7 +408,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 7px 10px;
+    padding: 10px 16px;
     color: var(--text-muted);
     cursor: pointer;
     background: none;
@@ -654,7 +440,6 @@
     border: 1px solid var(--line);
     border-bottom: 1px solid var(--bg-void);
     position: relative;
-    margin: 4px 0 0 0;
     z-index: 1;
   }
   .tab:not(.active):hover{
@@ -668,6 +453,20 @@
   }
 
 
+  .editor-main {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+  }  .editor-body{
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg-void);
+    display: flex;
+    justify-content: center;
+  }
+  
   .editor-body-inner{
     width: 100%;
     max-width: 960px;
@@ -763,76 +562,18 @@
   .content-view{ display:none; max-width:780px; margin:40px auto 60px; padding:0 24px; animation:fadeIn .3s ease; }
   .content-view.active{ display:block; }
   @keyframes fadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
-  .article-body{ line-height:1.8; color:var(--text-primary); }
-  .article-body h1{ font-size:26px; font-weight:700; margin:32px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line); }
-  .article-body h2{ font-size:20px; font-weight:600; margin:28px 0 12px; }
-  .article-body h3{ font-size:17px; font-weight:600; margin:24px 0 10px; color:var(--accent-cyan); }
-  .article-body p{ margin:0 0 16px; color:var(--text-secondary); }
-  .article-body blockquote{ margin:16px 0; padding:12px 20px; border-left:3px solid var(--accent-amber); background:var(--bg-panel); border-radius:0 6px 6px 0; color:var(--text-muted); font-style:italic; }
-  .article-body code{ font-family:var(--mono); background:var(--bg-panel); padding:2px 6px; border-radius:4px; font-size:.85em; color:var(--accent-green); }
-  .article-body pre{ background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:16px 20px; overflow-x:auto; margin:16px 0; font-size:14px; }
-  .math-block{ text-align: center; margin: 20px 0; overflow-x: auto; }
-  .article-body pre code{ background:none; padding:0; color:var(--accent-cyan); }
-  .article-body hr{ border:none; border-top:1px dashed var(--line); margin:36px 0; }
-  /*
-  marked 生成的 Markdown HTML 样式
-  包括：表格、列表、代码块、链接、引用等
-  覆盖默认的 article-body 作用域
-*/
-  .article-body ul,
-  .article-body ol{
-    padding-left: 24px;
-    margin: 0 0 16px;
-    color: var(--text-secondary);
-    line-height: 1.8;
-  }
-  .article-body li{
-    margin-bottom: 4px;
-  }
-  .article-body a{
-    color: var(--accent-cyan);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    transition: color 0.15s ease;
-  }
-  .article-body a:hover{
-    color: var(--accent-green);
-  }
-  .article-body blockquote p{
-    margin: 0;
-    color: inherit;
-  }
-  .article-body table{
-    border-collapse: collapse;
-    width: 100%;
-    margin: 16px 0;
-    font-size: 14px;
-  }
-  .article-body th,
-  .article-body td{
-    border: 1px solid var(--line);
-    padding: 8px 12px;
-    text-align: left;
-  }
-  .article-body th{
-    background: var(--bg-elevated);
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-  .article-body td{
-    color: var(--text-secondary);
-  }
-  .article-body pre{
-    position: relative;
-  }
-  .math-block{ text-align: center; margin: 20px 0; overflow-x: auto; }
-  .article-body pre code{
-    background: none;
-    padding: 0;
-    color: var(--accent-cyan);
-  }
-  .article-body strong{ color:var(--text-primary); }
-  .article-body em{ color:var(--accent-amber); }
+  .content-view.article-body{ line-height:1.8; color:var(--text-primary); }
+  .content-view.article-body h1{ font-size:26px; font-weight:700; margin:32px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  .content-view.article-body h2{ font-size:20px; font-weight:600; margin:28px 0 12px; }
+  .content-view.article-body h3{ font-size:17px; font-weight:600; margin:24px 0 10px; color:var(--accent-cyan); }
+  .content-view.article-body p{ margin:0 0 16px; color:var(--text-secondary); }
+  .content-view.article-body blockquote{ margin:16px 0; padding:12px 20px; border-left:3px solid var(--accent-amber); background:var(--bg-panel); border-radius:0 6px 6px 0; color:var(--text-muted); font-style:italic; }
+  .content-view.article-body code{ font-family:var(--mono); background:var(--bg-panel); padding:2px 6px; border-radius:4px; font-size:.85em; color:var(--accent-green); }
+  .content-view.article-body pre{ background:var(--bg-panel); border:1px solid var(--line); border-radius:8px; padding:16px 20px; overflow-x:auto; margin:16px 0; font-size:14px; }
+  .content-view.article-body pre code{ background:none; padding:0; color:var(--accent-cyan); }
+  .content-view.article-body hr{ border:none; border-top:1px dashed var(--line); margin:36px 0; }
+  .content-view.article-body strong{ color:var(--text-primary); }
+  .content-view.article-body em{ color:var(--accent-amber); }
   .content-view .md-meta{ font-size:13px; color:var(--text-muted); margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--line); display:flex; gap:16px; align-items:center; }
   .content-view .md-meta .back-link{ color:var(--accent-cyan); cursor:pointer; font-size:13px; }
   .content-view .md-meta .back-link:hover{ text-decoration:underline; }
@@ -1068,7 +809,7 @@
 
   /* ============ RESPONSIVE ============ */
   @media (max-width: 880px){
-    .app{ position: relative; }
+    .app{ grid-template-columns: 1fr; position: relative; }
     .menu-toggle{ display: flex; }
     .sidebar-peek{ display: flex; }
     .sidebar{
@@ -1092,12 +833,6 @@
     .hero{ padding-top: 36px; }
     .post{ grid-template-columns: 40px 1fr; }
     .statusbar .hide-sm{ display: none; }
-    .toc-panel{
-      right: 8px;
-      top: calc(44px + 8px);
-      width: 180px;
-      max-height: calc(100vh - 44px - 28px - 24px);
-    }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -1106,25 +841,24 @@
 
   .toc-panel {
     position: fixed;
-    right: 12px;
-    top: calc(44px + 12px);
-    max-height: calc(100vh - 44px - 28px - 36px);
-    width: 210px;
+    right: 0;
+    top: 88px;
+    bottom: 28px;
+    width: 220px;
     background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(240,244,249,0.4));
-    border: 1px solid var(--line);
-    border-radius: 12px;
+    border-left: 1px solid rgba(14,165,233,0.12);
     display: none;
     flex-direction: column;
     overflow: hidden;
     z-index: 25;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    backdrop-filter: blur(4px);
+    box-shadow: -4px 0 16px rgba(0,0,0,0.03);
   }
   @media (prefers-color-scheme: dark) {
     .toc-panel {
       background: linear-gradient(180deg, rgba(15,20,29,0.6), rgba(21,29,40,0.4));
-      border-color: var(--line);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      border-left-color: rgba(35,45,59,0.5);
+      box-shadow: -4px 0 16px rgba(0,0,0,0.2);
     }
   }
   .toc-panel.open {
@@ -1217,12 +951,10 @@
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 28px;
-    height: 10vh;
-    min-height: 60px;
-    max-height: 120px;
-    background: linear-gradient(90deg, rgba(14,165,233,0.20), transparent);
-    border: 1px solid rgba(14,165,233,0.25);
+    width: 24px;
+    height: 48px;
+    background: linear-gradient(90deg, rgba(14,165,233,0.08), transparent);
+    border: 1px solid rgba(14,165,233,0.15);
     border-right: none;
     border-radius: 8px 0 0 8px;
     color: var(--text-muted);
@@ -1241,8 +973,8 @@
   }
   @media (prefers-color-scheme: dark) {
     .toc-peek{
-      background: linear-gradient(90deg, rgba(76,247,255,0.18), transparent);
-      border-color: rgba(76,247,255,0.20);
+      background: linear-gradient(90deg, rgba(76,247,255,0.08), transparent);
+      border-color: rgba(35,45,59,0.4);
     }
     .toc-peek:hover{
       background: linear-gradient(90deg, rgba(76,247,255,0.15), transparent);
@@ -1251,14 +983,11 @@
     }
   }
   .toc-peek.hidden { display: none; }
-
+  .toc-peek svg { width: 14px; height: 14px; }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
 
@@ -1274,9 +1003,9 @@
 
   <div class="app">
 
-    <div class="scrim" id="scrim" aria-hidden="true"></div>
+    <div class="scrim" id="scrim"></div>
 
-    <!-- ================= 侧边栏（文件树 / 游戏链接 / 猫猫） ================= -->
+    <!-- ================= SIDEBAR ================= -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <span>EXPLORER</span>
@@ -1285,43 +1014,55 @@
 
       <nav class="tree">
         <div class="root-label"><span class="chev">▾</span> blog/</div>
+
         <div class="folder open">
           <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 控制理论</button>
           <ul class="files">
-            <li><a href="#" data-md="source/document/数学模型.md" data-folder="控制理论" data-file="数学模型" data-category="技术"><span class="file-dot">🔧</span>数学模型</a></li>
-            <li><a href="#" data-md="source/document/theory.md" data-folder="控制理论" data-file="时域分析" data-category="技术"><span class="file-dot">🔧</span>时域分析</a></li>
+            <li><a href="#" data-md="source/document/数学模型.md" data-folder="控制理论" data-file="数学模型"><span class="file-dot">·</span>数学模型</a></li>
+            <li><a href="#" data-md="source/document/theory.md" data-folder="控制理论" data-file="控制理论入门"><span class="file-dot">·</span>控制理论入门</a></li>
+            <li><a href="#"><span class="file-dot">·</span>文章标题三</a></li>
           </ul>
         </div>
-        <div class="folder open">
-          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 个人想法</button>
+
+        <div class="folder">
+          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 分类二</button>
           <ul class="files">
+            <li><a href="#"><span class="file-dot">·</span>文章标题四</a></li>
+            <li><a href="#"><span class="file-dot">·</span>文章标题五</a></li>
           </ul>
         </div>
+
+        <div class="folder">
+          <button class="folder-toggle"><span class="chev">▸</span><span class="folder-icon">📁</span> 分类三</button>
+          <ul class="files">
+            <li><a href="#"><span class="file-dot">·</span>文章标题六</a></li>
+          </ul>
+        </div>
+
         <a href="game/index.html" class="sidebar-game-link">
           <span style="width:20px;text-align:center">🎮</span>
           游戏盒子
         </a>
-</nav>
-
-      <div class="sidebar-footer">
-        <div class="cat-wrap" id="catWrap">
-          <img src="source/image/cat.png" alt="猫猫" class="footer-cat" id="footerCat">
-        </div>
-        <div class="donate-text">点击猫猫为作者捐献一杯奶茶🧋</div>
-        
-
-      </div>
+      </nav>
 
     </aside>
 
-    <!-- ================= MAIN VIEW ================= -->
-    <div class="main-view">
+    <!-- ================= EDITOR / MAIN ================= -->
+    <div class="editor">
 
       <div class="tabbar">
         <button class="tab active" data-panel="panel-index"><span class="file-dot" style="color:var(--accent-cyan)">●</span>首页</button>
 
       </div>
-      <div class="content-wrapper">
+      <button class="sidebar-peek" id="sidebarPeek" aria-label="打开侧边栏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <button class="toc-peek" id="tocPeek" title="显示目录">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <div class="editor-main"><div class="editor-body">
         <div class="editor-body-inner">
 
         <!-- index 面板 -->
@@ -1346,7 +1087,7 @@
             </div>
             <h1>欢迎来到<span class="dim">这个博客</span></h1>
             <p class="lede">左侧是我个人写的文章，点开文件夹就能找到对应内容。希望可以帮助到你</p>
-            <p class="lede">如果不喜欢也别急着走，左侧文章最下边有几个我的自制小游戏可以玩</p>
+            <p class="lede">如果不喜欢也别急着走，左侧最下边有几个我的自制小游戏可以玩</p>
             <p class="lede">国内网络访问慢，见谅</p>
             <div class="tag-row">
               <span class="pill">#控制理论</span>
@@ -1355,7 +1096,9 @@
 
 
         <!-- about 面板 -->
+
         </div>
+      </div>
         <div class="toc-panel" id="tocPanel">
           <div class="toc-header">
             <span>&#x1F4D1; 目录</span>
@@ -1370,26 +1113,18 @@
         <span id="update-time">更新于 2026-06-22</span>
 
     </div>
-    <button class="sidebar-peek" id="sidebarPeek" aria-label="打开侧边栏">
-      <span class="peek-label toc-label">🗂️文件</span>
-    </button>
-
-    <button class="toc-peek" id="tocPeek" title="显示目录">
-      <span class="peek-label toc-label">📑目录</span>
-    </button>
-
   </div>
 </div>
 
 <script>
-  // ==================== 侧边栏交互 ====================
+  // 文件夹展开/收起
   document.querySelectorAll('.folder-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       btn.parentElement.classList.toggle('open');
     });
   });
 
-  // ==================== 标签页（Tab）切换 ====================
+  // 标签页切换
   const tabs = document.querySelectorAll('.tab');
   const panels = document.querySelectorAll('.panel');
   // Use switchToPanel for all tab clicks (handles static + dynamic)
@@ -1420,11 +1155,11 @@
   tabs.forEach(function(tab) {
     tab.addEventListener('click', function() {
       switchToPanel(this.dataset.panel);
-      document.querySelector('.content-wrapper').scrollTo({top: 0, behavior: 'smooth'});
+      document.querySelector('.editor-body').scrollTo({top: 0, behavior: 'smooth'});
     });
   });
 
-  // ==================== 移动端：侧边栏手势 + 蒙层 ====================
+  // 移动端侧边栏
   const sidebar = document.getElementById('sidebar');
   const menuToggle = document.getElementById('menuToggle');
   const scrim = document.getElementById('scrim');
@@ -1464,7 +1199,7 @@
     }
   }, {passive: true});
 
-  // ==================== Markdown 文档阅读器 ====================
+  // --- Markdown viewer: dynamic closable tabs ---
   var dynamicId = 0;
   var tabbar = document.querySelector('.tabbar');
   var bodyInner = document.querySelector('.editor-body-inner');
@@ -1477,7 +1212,7 @@
     }
   }
 
-    function simpleMarkdown(text) {
+  function simpleMarkdown(text) {
     var html = text
       .replace(/^### (.+)$/gm, '<h3>$1</h3>')
       .replace(/^## (.+)$/gm, '<h2>$1</h2>')
@@ -1512,13 +1247,8 @@
     return html;
   }
 
-  function openDoc(mdPath, title, folder, category) {
-    // Map category to icon
-                                                            var catIcon = '○';
-    if (category === '技术') catIcon = '🔧';
-    else if (category === '理论') catIcon = '📘';
-    else if (category === '想法') catIcon = '💡';
-    else if (category === '其他') catIcon = '·';// Check if already open
+  function openDoc(mdPath, title, folder) {
+    // Check if already open
     var existing = document.querySelector('[data-md-panel="' + mdPath.replace(/"/g,'') + '"]');
     if (existing) {
       switchToPanel(existing.dataset.panel);
@@ -1536,7 +1266,7 @@
     tab.className = 'tab';
     tab.dataset.panel = panelId;
     tab.dataset.mdPanel = mdPath;
-    tab.innerHTML = '<span class=\"file-icon-tab\">' + catIcon + '</span> ' + title + ' <span class="tab-close" style=\"margin-left:6px;cursor:pointer;opacity:.5;font-size:14px;\">✕</span>';
+    tab.innerHTML = '<span class="file-dot">\u25cb</span> ' + title + ' <span class="tab-close" style="margin-left:6px;cursor:pointer;opacity:.5;font-size:14px;">\u2715</span>';
     tabbar.appendChild(tab);
 
     // Update index tab visibility
@@ -1567,15 +1297,10 @@
     fetch(mdPath)
       .then(function(r) { if (!r.ok) throw new Error('Not found'); return r.text(); })
       .then(function(text) {
-        var eqs = [];
-        text = text.replace(/\$\$([\s\S]*?)\$\$/g, function(m, eq) { eqs.push(eq); return '<div class="m-eq" data-i="'+(eqs.length-1)+'"></div>'; });
-        var html = marked.parse(text);
-        html = html.replace(/<div class="m-eq" data-i="(\d+)"><\/div>/g, function(m, i) { return '<div class="math-block">$$\n'+eqs[i]+'\n$$</div>'; });
-        panel.innerHTML = '<div class="article-body" style="max-width:780px;margin:0 auto;padding:24px;">' + html + '</div>';
+        panel.innerHTML = '<div class="article-body" style="max-width:780px;margin:0 auto;padding:24px;">' + simpleMarkdown(text) + '</div>';
         if (window.renderMathInElement) {
           renderMathInElement(panel, {delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}]});
         }
-        if (window.hljs) hljs.highlightAll();
         setTimeout(buildTOC, 100);
       })
       .catch(function() {
@@ -1608,13 +1333,13 @@
 
 
   
-  // ==================== 目录（Table of Contents） ====================
+  // === TOC (目录) ===
   var tocVisible = false;
 
   function buildTOC() {
     var panel = document.querySelector('.panel.active');
     if (!panel) return;
-    var headings = panel.querySelectorAll('h1, h2, h3');
+    var headings = panel.querySelectorAll('h2, h3');
     var container = document.getElementById('tocBody');
     if (!container) return;
     if (headings.length === 0) {
@@ -1676,133 +1401,10 @@
       var mdTitle = this.dataset.file || this.textContent.trim().replace(/^\u00b7/, '');
       var folderEl = this.closest('.folder');
       var mdFolder = folderEl ? folderEl.querySelector('.folder-toggle').textContent.replace(/[▸📁]/g, '').trim() : '';
-      openDoc(mdPath, mdTitle, mdFolder, this.dataset.category);
+      openDoc(mdPath, mdTitle, mdFolder);
     });
   });
 </script>
 
-
-<!-- ================= 猫猫打赏弹窗 =================
-  点击侧边栏底部猫猫触发
-  role="dialog" + aria-modal 确保无障碍
-  body 内猫猫图片 → 点击「打赏」→ canvas 二维码
-============================================== -->
-<div class="cat-modal-overlay" id="catModalOverlay" role="dialog" aria-modal="true" aria-labelledby="catModalTitle" aria-hidden="true">
-  <div class="cat-modal">
-    <button class="cat-modal-close" id="catModalClose" aria-label="关闭弹窗">&times;</button>
-    <div class="cat-modal-body">
-      <img src="source/image/money_cat.png" alt="猫" class="cat-modal-img">
-      <div class="cat-modal-text">
-        <h3 id="catModalTitle">抓到一只猫猫！</h3>
-        <p>点击按钮调出打赏码，完全自愿的喵～<br>只要这里的文章对你有帮助，那这只猫猫就很开心啦❤️</p>
-        <button class="donate-btn" id="donateBtn">打赏</button>
-    </div>
-  </div>
-</div>
-
-<script>
-
-  // 猫猫弹窗
-  document.addEventListener('DOMContentLoaded', function() {
-    var catWrap = document.getElementById('catWrap');
-    var catModal = document.getElementById('catModalOverlay');
-    var catClose = document.getElementById('catModalClose');
-    var prevFocus = null;
-    function openModal() {
-      if (!catModal) return;
-      prevFocus = document.activeElement;
-      catModal.classList.add('open');
-      catModal.setAttribute('aria-hidden', 'false');
-      if (catClose) setTimeout(function() { catClose.focus(); }, 50);
-      var img = document.querySelector('img.cat-modal-img');
-      var cv = document.querySelector('.qrcode-canvas');
-      if (img) img.style.display = '';
-      if (cv) cv.remove();
-    }
-    function closeModal() {
-      if (!catModal) return;
-      catModal.classList.remove('open');
-      catModal.setAttribute('aria-hidden', 'true');
-      if (prevFocus) { prevFocus.focus(); prevFocus = null; }
-    }
-    if (catWrap && catModal) {
-      catWrap.addEventListener('click', openModal);
-      catWrap.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
-      });
-      if (catClose) catClose.addEventListener('click', closeModal);
-      catModal.addEventListener('click', function(e) {
-        if (e.target === catModal) closeModal();
-      });
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && catModal.classList.contains('open')) closeModal();
-      });
-      catModal.addEventListener('keydown', function(e) {
-        if (e.key !== 'Tab') return;
-        var fb = catModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-        if (fb.length === 0) return;
-        var first = fb[0], last = fb[fb.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      });
-
-      // 打赏 彩色粒子 + canvas 加密
-      var donateBtn = document.getElementById('donateBtn');
-      if (donateBtn) {
-        donateBtn.addEventListener('click', function(e) {
-          var container = document.querySelector('.cat-modal-body');
-          if (!container) return;
-
-          // ---- 彩色粒子爆散 ----
-          var rect = this.getBoundingClientRect();
-          var cx = rect.left + rect.width / 2;
-          var cy = rect.top + rect.height / 2;
-          var cols = ['#f87171','#fbbf24','#34d399','#60a5fa','#a78bfa','#f472b6','#fb923c'];
-          for (var i = 0; i < 30; i++) {
-            var dot = document.createElement('div');
-            dot.className = 'particle';
-            dot.style.background = cols[Math.floor(Math.random()*cols.length)];
-            dot.style.left = cx + 'px';
-            dot.style.top = cy + 'px';
-            document.body.appendChild(dot);
-            requestAnimationFrame(function(el) {
-              return function() {
-                el.style.transform = 'translate(' + (Math.random()*200-100) + 'px,' + (Math.random()*200-140) + 'px) scale(0)';
-                el.style.opacity = '0';
-              };
-            }(dot));
-            setTimeout(function(el) { el.remove(); }, 800, dot);
-          }
-
-          // ---- 显示 QR ----
-          var oldImg = container.querySelector('.cat-modal-img');
-          if (oldImg) oldImg.style.display = 'none';
-          var oldCanvas = container.querySelector('.qrcode-canvas');
-          if (oldCanvas) oldCanvas.remove();
-          fetch('source/data/st')
-            .then(function(r) { return r.blob(); })
-            .then(function(blob) { return new Blob([blob], {type:'image/png'}); })
-            .then(function(blob) { return createImageBitmap(blob); })
-            .then(function(bitmap) {
-              var canvas = document.createElement('canvas');
-              canvas.className = 'cat-modal-img qrcode-canvas';
-              canvas.width = bitmap.width;
-              canvas.height = bitmap.height;
-              var ctx = canvas.getContext('2d');
-              ctx.drawImage(bitmap, 0, 0);
-              var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-              var d = imgData.data;
-              for (var i = 0; i < d.length; i += 8) { d[i+3] = d[i+3] ^ 3; }
-              ctx.putImageData(imgData, 0, 0);
-              container.insertBefore(canvas, container.firstChild);
-              canvas.style.animation = 'popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            });
-        });
-      }
-    }
-  });
-
-</script>
 </body>
 </html>
-
